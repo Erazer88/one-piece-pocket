@@ -156,6 +156,10 @@ img {
 .view-root {
   flex: 1;
   padding: 16px 16px calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 28px);
+  /* Les décors (rayons, halos) ne doivent jamais élargir la page : sur mobile, le
+     navigateur dézoomerait tout l'écran. */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .tabbar {
@@ -1019,6 +1023,7 @@ img {
   position: fixed;
   inset: 0;
   z-index: 100;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1096,12 +1101,14 @@ img {
 }
 
 .opening .pack {
+  width: min(60vw, 250px, calc((100vh - 230px) * 0.625));
   width: min(60vw, 250px, calc((100dvh - 230px) * 0.625));
   cursor: grab;
 }
 
 .card-stack {
   position: relative;
+  width: min(72vw, 310px, calc((100vh - 250px) * 0.716));
   width: min(72vw, 310px, calc((100dvh - 250px) * 0.716));
   aspect-ratio: 600 / 838;
 }
@@ -1299,6 +1306,7 @@ img {
 }
 
 .tilt {
+  width: min(76vw, 320px, calc((100vh - 300px) * 0.716));
   width: min(76vw, 320px, calc((100dvh - 300px) * 0.716));
   perspective: 900px;
   touch-action: none;
