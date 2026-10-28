@@ -18,6 +18,19 @@ Prototype web sans framework ni dépendance : ouvrir `index.html` dans un naviga
 
 La collection est sauvegardée sur l'appareil (`localStorage`).
 
+## Son
+
+Une playlist de musiques chill d'ambiance mer et pirate démarre au premier toucher
+(les navigateurs mobiles bloquent le son avant). Elle baisse pendant l'ouverture d'un
+booster. Chaque étape a son bruitage : prise du booster, déchirure, sortie des cartes,
+glissement, révélation des cartes rares et récapitulatif. Le bouton haut-parleur en
+haut de l'écran coupe la musique ou les effets et passe à la piste suivante.
+
+Ce ne sont pas les musiques officielles de One Piece : elles sont protégées et ne
+peuvent pas être publiées dans ce dépôt. Toutes les pistes sont libres de droits
+(CC0 ou CC-BY) ; voir [`assets/audio/CREDITS.md`](assets/audio/CREDITS.md). Les
+crédits sont aussi affichés dans l'écran Profil.
+
 ## Organisation
 
 | Fichier | Rôle |
@@ -26,10 +39,12 @@ La collection est sauvegardée sur l'appareil (`localStorage`).
 | `src/data/cards-op01.js` | Cartes de OP-01 « Romance Dawn » (généré, ne pas éditer). |
 | `src/data/labels.js` | Libellés, rangs et niveaux d'effet des raretés et variantes. |
 | `src/data/boosters.js` | Composition des boosters et taux de drop (déclaratif). |
+| `src/data/audio.js` | Playlist, bruitages, volumes et crédits audio. |
+| `assets/audio/` | Musiques et bruitages libres de droits (MP3). |
 | `src/booster.js` | Tirage d'un booster, pur et déterministe si on lui passe une graine. |
 | `src/cards.js` | Niveau d'effet, score de rareté et libellés d'une carte. |
 | `src/collection.js` | Collection et statistiques du joueur, sauvegarde. |
-| `src/ui/` | Interface : composants de carte, ouverture animée, écrans et modales. |
+| `src/ui/` | Interface : composants de carte, ouverture animée, son, écrans et modales. |
 | `src/app.js` | Initialisation et navigation entre les écrans. |
 
 ## Cartes

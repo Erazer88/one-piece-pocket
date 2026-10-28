@@ -19,6 +19,13 @@
     );
   }
 
+  function creditList(items) {
+    return h('ul', { class: 'credits' }, items.map((item) => h('li', {},
+      h('a', { href: item.url, target: '_blank', rel: 'noopener' }, item.title),
+      h('span', {}, ` — ${item.author} · ${item.license}`),
+    )));
+  }
+
   function render(ctx) {
     const { collection, stats } = ctx.state;
     const cards = ctx.collectible;
@@ -62,6 +69,12 @@
             onclick: () => ctx.showCard(card),
           }, cardFace(card, { lazy: true }))))
           : h('p', { class: 'empty' }, 'Ouvre ton premier booster pour commencer ta collection.'),
+      ),
+      h('section', { class: 'panel' },
+        h('h3', { class: 'panel-title' }, 'Crédits audio'),
+        h('p', { class: 'credits-intro' }, 'Musiques et sons libres de droits.'),
+        creditList(OPP.audio.music),
+        creditList(OPP.audio.soundCredits),
       ),
       h('button', { class: 'btn btn-danger btn-block reset-button', type: 'button', onclick: ctx.resetCollection },
         'Réinitialiser la collection'),

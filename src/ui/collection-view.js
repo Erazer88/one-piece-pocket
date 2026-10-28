@@ -46,6 +46,7 @@
         'data-filter': filter.id,
         onclick: () => {
           filterState.filter = filter.id;
+          OPP.Sound.play('click');
           refresh();
         },
       }, filter.label, h('span', { class: 'chip-count' }, `${owned}/${cards.length}`));
@@ -56,6 +57,7 @@
       checked: filterState.ownedOnly,
       onchange: (event) => {
         filterState.ownedOnly = event.target.checked;
+        OPP.Sound.play('toggle');
         refresh();
       },
     });

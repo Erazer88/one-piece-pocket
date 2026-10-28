@@ -3,6 +3,7 @@
   const OPP = (root.OPP = root.OPP || {});
   const { h, animate, wait, ms } = OPP.Dom;
   const { flipCard, cardFace, packElement, rarityPill, burst, preload } = OPP.CardView;
+  const { Sound } = OPP;
 
   const SKIP = Symbol('skip');
   const SWIPE_DISTANCE = 70;
@@ -142,6 +143,7 @@
   }
 
   function flyAway(element, direction) {
+    Sound.play('slide', { rate: 0.9 + Math.random() * 0.2 });
     const from = getComputedStyle(element).transform;
     element.style.transition = 'none';
     return animate(element, [
@@ -173,6 +175,7 @@
     view.hint.textContent = '';
     await wait(ms(180));
     packEl.classList.add('is-torn');
+    Sound.play('tear');
     flash(view, 0.6);
     vibrate(20);
     const loadingHint = setTimeout(() => { view.hint.textContent = 'Chargement des cartes…'; }, 900);
@@ -196,6 +199,7 @@
     });
     const stack = h('div', { class: 'card-stack' }, stackEls);
     view.stage.prepend(stack);
+    Sound.play('takeOut');
     await Promise.all([
       animate(body, [
         { transform: 'none', opacity: 1 },
@@ -219,9 +223,16 @@
       const power = step === 0 || step === 8 ? 0 : amplitude * (0.5 + step / 16);
       shake.push({ transform: `translate(${side * power}px, ${-power / 2}px) rotate(${side * power / 3}deg)` });
     }
-    await animate(element, shake, { duration: ms(strong ? 850 : 480), easing: 'ease-in' });
+    const shakeDuration = ms(strong ? 850 : 480);
+    Sound.riser(shakeDuration / 1000);
+    await animate(element, shake, { duration: shakeDuration, easing: 'ease-in' });
     view.overlay.classList.add(`fx-${tier}`);
     element.classList.add('is-face-up');
+    Sound.play('shimmer');
+    if (strong) {
+      Sound.play('chime', { delay: 0.08 });
+      Sound.sparkle();
+    }
     flash(view, strong ? 0.95 : 0.6);
     vibrate(strong ? [40, 60, 90] : 35);
     await wait(ms(160));
@@ -270,6 +281,7 @@
     const done = h('button', { class: 'btn btn-ghost btn-block', type: 'button' }, 'Retour');
     view.overlay.classList.remove('fx-super', 'fx-secret');
     view.overlay.classList.add('is-summary');
+    Sound.play('fan');
     view.counter.textContent = view.setName;
     showCaption(view, null);
     view.hint.textContent = '';
@@ -321,6 +333,8 @@
     );
     document.body.append(view.overlay);
     document.body.classList.add('is-locked');
+    Sound.setDucked(true);
+    Sound.play('packPickUp');
     const imagesReady = preload(pack.map((card) => card.image), 6000);
 
     await Promise.all([
@@ -339,6 +353,7 @@
     await animate(view.overlay, [{ opacity: 1 }, { opacity: 0 }], { duration: ms(220), fill: 'forwards' });
     view.overlay.remove();
     document.body.classList.remove('is-locked');
+    Sound.setDucked(false);
     return choice;
   }
 

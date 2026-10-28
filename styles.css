@@ -125,6 +125,35 @@ img {
   box-shadow: 0 2px 0 var(--red-dark);
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  color: var(--gold);
+  cursor: pointer;
+}
+
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .topbar-pill {
   display: inline-flex;
   align-items: center;
@@ -1015,6 +1044,68 @@ img {
 
 .reset-button {
   margin-top: 24px;
+}
+
+.credits-intro {
+  margin: -4px 0 10px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.credits {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.credits a {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration-color: rgb(245 200 76 / 50%);
+}
+
+/* ---------- Réglages du son ---------- */
+
+.sound-panel h3 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+}
+
+.sound-row {
+  margin: 0;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.now-playing {
+  display: grid;
+  gap: 2px;
+  margin: 16px 0 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  text-align: center;
+}
+
+.now-playing span,
+.now-playing small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.now-playing strong {
+  color: var(--gold);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 /* ---------- Ouverture d'un booster ---------- */

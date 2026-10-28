@@ -18,10 +18,13 @@
   <div class="app">
     <header class="topbar">
       <h1 class="logo"><span class="logo-main">One Piece</span><span class="logo-sub">Pocket</span></h1>
-      <span class="topbar-pill" title="Cartes obtenues">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13"/></svg>
-        <span id="topbar-count">0/0</span>
-      </span>
+      <div class="topbar-actions">
+        <button id="sound-button" class="icon-button" type="button" aria-label="Réglages du son"></button>
+        <span class="topbar-pill" title="Cartes obtenues">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13"/></svg>
+          <span id="topbar-count">0/0</span>
+        </span>
+      </div>
     </header>
     <main id="view" class="view-root"></main>
     <nav class="tabbar" aria-label="Menu principal">
@@ -42,13 +45,16 @@
   <script src="src/data/cards-op01.js"></script>
   <script src="src/data/labels.js"></script>
   <script src="src/data/boosters.js"></script>
+  <script src="src/data/audio.js"></script>
   <script src="src/booster.js"></script>
   <script src="src/cards.js"></script>
   <script src="src/collection.js"></script>
   <script src="src/ui/dom.js"></script>
+  <script src="src/ui/sound.js"></script>
   <script src="src/ui/card-view.js"></script>
   <script src="src/ui/modal.js"></script>
   <script src="src/ui/opening.js"></script>
+  <script src="src/ui/sound-panel.js"></script>
   <script src="src/ui/home-view.js"></script>
   <script src="src/ui/collection-view.js"></script>
   <script src="src/ui/profile-view.js"></script>

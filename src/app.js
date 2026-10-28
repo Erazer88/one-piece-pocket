@@ -10,6 +10,7 @@
   const booster = OPP.boosters[BOOSTER_ID];
   const set = OPP.sets[booster.set];
   const storage = OPP.Collection.storage();
+  OPP.Sound.init(storage);
   const state = {
     collection: OPP.Collection.load(storage),
     stats: OPP.Collection.loadStats(storage),
@@ -52,6 +53,7 @@
   function navigate(name) {
     if (name === current || !views[name]) return;
     current = name;
+    OPP.Sound.play('click');
     root.scrollTo(0, 0);
     render(true);
   }
@@ -76,6 +78,7 @@
   }
 
   function showCard(card) {
+    OPP.Sound.play('place');
     return OPP.Modal.showCard(card, state.collection[card.id] || 0);
   }
 
@@ -94,5 +97,6 @@
   }
 
   for (const tab of tabs) tab.addEventListener('click', () => navigate(tab.dataset.tab));
+  OPP.SoundPanel.bindButton(document.getElementById('sound-button'));
   render();
 })(globalThis);
