@@ -6,6 +6,10 @@
   // Un booster gratuit toutes les 6 heures ; jusqu'à 2 boosters en réserve.
   OPP.packTimer = { intervalHours: 6, maxCharges: 2 };
 
+  // Les cartes à partir de la Secret Rare sortent 3 fois plus souvent que dans une
+  // vraie boîte, pour rester atteignables à raison d'un booster toutes les 6 heures.
+  const RARE_BOOST = 3;
+
   // Dernière carte du booster, en cartes par boîte de 24 boosters. Une entrée sans
   // carte dans l'extension (pas de manga, par exemple) laisse sa place à `fill`.
   const HITS_PER_BOX = [
@@ -13,13 +17,13 @@
     { amount: 7, pool: { rarity: 'SR' } },
     { amount: 2, pool: { rarity: 'R' } },
     { amount: 2, pool: { rarity: ['C', 'UC', 'R', 'SR', 'L'], variant: 'parallel' } },
-    { amount: 1 / 3, pool: { rarity: 'SEC' } },
-    { amount: 1 / 10, pool: { rarity: 'SEC', variant: 'parallel' } },
-    { amount: 1 / 6, pool: { variant: 'sp' } },
-    { amount: 1 / 12, pool: { variant: 'treasure' } },
-    { amount: 1 / 32, pool: { variant: 'superParallel' } },
-    { amount: 1 / 48, pool: { variant: 'manga' } },
-    { amount: 1 / 500, pool: { variant: 'gold' } },
+    { amount: RARE_BOOST / 3, pool: { rarity: 'SEC' } },
+    { amount: RARE_BOOST / 10, pool: { rarity: 'SEC', variant: 'parallel' } },
+    { amount: RARE_BOOST / 6, pool: { variant: 'sp' } },
+    { amount: RARE_BOOST / 12, pool: { variant: 'treasure' } },
+    { amount: RARE_BOOST / 32, pool: { variant: 'superParallel' } },
+    { amount: RARE_BOOST / 48, pool: { variant: 'manga' } },
+    { amount: RARE_BOOST / 500, pool: { variant: 'gold' } },
   ];
 
   // 6 cartes par booster, comme les boosters japonais. Les Extra Boosters n'ont pas

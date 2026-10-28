@@ -480,6 +480,8 @@ img {
   filter: drop-shadow(0 16px 22px rgb(20 30 50 / 20%)) drop-shadow(0 2px 4px rgb(20 30 50 / 10%));
   touch-action: none;
   user-select: none;
+  /* Les textes du booster suivent sa largeur (unités cqi). */
+  container-type: inline-size;
 }
 
 .pack-top,
@@ -514,6 +516,7 @@ img {
 .pack-top-label {
   padding-top: 4px;
   font-size: 0.62rem;
+  font-size: 4.7cqi;
   font-weight: 900;
   letter-spacing: 0.2em;
   color: rgb(255 255 255 / 92%);
@@ -566,6 +569,7 @@ img {
   margin-bottom: 4px;
   white-space: nowrap;
   font-size: 0.5rem;
+  font-size: 3.8cqi;
   font-weight: 800;
   letter-spacing: 0.24em;
   text-transform: uppercase;
@@ -578,6 +582,7 @@ img {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   font-size: 1.05rem;
+  font-size: 8cqi;
   font-weight: 900;
   line-height: 1.1;
 }
@@ -589,6 +594,7 @@ img {
   bottom: 5%;
   z-index: 1;
   font-size: 0.55rem;
+  font-size: 4.2cqi;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-align: center;
@@ -1188,6 +1194,50 @@ img {
   width: min(60vw, 250px, calc((100vh - 230px) * 0.61));
   width: min(60vw, 250px, calc((100dvh - 230px) * 0.61));
   cursor: grab;
+}
+
+/* Roue de boosters identiques : le joueur en choisit un. */
+.pick-ring {
+  --pick-width: min(34vw, 150px);
+  --radius: 240px;
+  position: relative;
+  width: 100%;
+  height: calc(var(--pick-width) * 1.64 + 60px);
+  perspective: 800px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.pick-spinner {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--radius) * -1)) rotateX(-5deg) rotateY(var(--spin, 0deg));
+  transform-style: preserve-3d;
+}
+
+.pick-pack {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--pick-width);
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(-50%, -50%) rotateY(var(--slot)) translateZ(var(--radius));
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  cursor: pointer;
+}
+
+.pick-pack .pack {
+  width: 100%;
+  filter: drop-shadow(0 10px 14px rgb(20 30 50 / 18%));
+}
+
+/* Pas de reflet animé sur les dix boosters à la fois : la roue reste fluide. */
+.pick-pack .pack-top::after,
+.pick-pack .pack-body::after {
+  display: none;
 }
 
 .card-stack {

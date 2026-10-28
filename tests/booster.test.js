@@ -75,6 +75,7 @@ test('les moyennes par boîte suivent les taux visés', () => {
   assert.ok(Math.abs(perBox('L') - 5) < 0.2, `L ${perBox('L')}`);
   assert.ok(Math.abs(perBox('SR') - 7) < 0.2, `SR ${perBox('SR')}`);
   assert.ok(Math.abs(perBox('R') - 26) < 0.2, `R ${perBox('R')}`);
-  assert.ok(Math.abs(perBox('SEC') - 1 / 3) < 0.05, `SEC ${perBox('SEC')}`);
-  assert.ok(Math.abs(perBox('parallel') - 2.12) < 0.15, `parallel ${perBox('parallel')}`);
+  // À partir de la Secret Rare, les taux réels sont triplés.
+  assert.ok(Math.abs(perBox('SEC') - 1) < 0.08, `SEC ${perBox('SEC')}`);
+  assert.ok(Math.abs(perBox('parallel') - (2 + 3 / 10 + 3 / 48)) < 0.15, `parallel ${perBox('parallel')}`);
 });

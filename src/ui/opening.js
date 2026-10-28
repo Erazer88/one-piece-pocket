@@ -6,6 +6,10 @@
   const { Sound } = OPP;
 
   const SKIP = Symbol('skip');
+  // Boosters identiques proposés au choix, et rotation automatique de la roue (°/s).
+  const PICK_COUNT = 10;
+  const PICK_SPIN_SPEED = 10;
+  const PICK_DRAG_RATIO = 0.35;
   const SWIPE_DISTANCE = 70;
   const TAP_DISTANCE = 10;
   const NEXT_KEYS = new Set(['Enter', ' ', 'ArrowRight']);
@@ -46,6 +50,151 @@
       { opacity: strength, offset: 0.15 },
       { opacity: 0 },
     ], { duration: ms(520), easing: 'ease-out' });
+  }
+
+  // Écart d'angle ramené entre -180° et 180°.
+  function angleDelta(angle) {
+    return ((((angle + 180) % 360) + 360) % 360) - 180;
+  }
+
+  // Roue de boosters identiques : le contenu est déjà tiré, le choix est visuel.
+  // Glisser fait tourner la roue ; toucher un booster le choisit. Résout avec le
+  // booster choisi, encore à sa place dans la roue.
+  function pickPack(view, booster, signal) {
+    return new Promise((resolve) => {
+      const step = 360 / PICK_COUNT;
+      const slots = Array.from({ length: PICK_COUNT }, (_, index) => h('button', {
+        class: 'pick-pack',
+        type: 'button',
+        'aria-label': `Booster ${index + 1} sur ${PICK_COUNT}`,
+        style: { '--slot': `${index * step}deg` },
+      }, packElement(booster)));
+      const spinner = h('div', { class: 'pick-spinner' }, slots);
+      const ring = h('div', { class: 'pick-ring' }, spinner);
+      view.stage.replaceChildren(ring);
+      // Rayon calculé pour que les boosters voisins se touchent presque.
+      const radius = (slots[0].offsetWidth * 0.56) / Math.tan(Math.PI / PICK_COUNT);
+      ring.style.setProperty('--radius', `${radius}px`);
+
+      let spin = 0;
+      let velocity = 0;
+      let drag = null;
+      let resumeAt = 0;
+      let chosen = false;
+      let last = performance.now();
+
+      const frontIndex = () => Math.round(-spin / step) % PICK_COUNT;
+      function apply() {
+        spinner.style.setProperty('--spin', `${spin}deg`);
+        slots.forEach((slot, index) => {
+          const facing = Math.cos((angleDelta(index * step + spin) * Math.PI) / 180);
+          slot.style.opacity = (0.3 + 0.7 * Math.max(0, facing)).toFixed(3);
+        });
+      }
+
+      function frame(now) {
+        if (signal.aborted || chosen) return;
+        const seconds = Math.min(now - last, 50) / 1000;
+        last = now;
+        if (!drag) {
+          if (Math.abs(velocity) > 2) {
+            spin += velocity * seconds;
+            velocity *= Math.pow(0.05, seconds);
+          } else if (now > resumeAt && !OPP.Dom.reducedMotion.matches) {
+            spin -= PICK_SPIN_SPEED * seconds;
+          }
+        }
+        apply();
+        requestAnimationFrame(frame);
+      }
+
+      // Amène le booster choisi face au joueur, efface les autres, puis résout.
+      async function choose(slot) {
+        if (chosen) return;
+        chosen = true;
+        const index = slots.indexOf(slot);
+        const from = spin;
+        const target = spin + angleDelta(-index * step - spin);
+        const start = performance.now();
+        const duration = ms(380);
+        await new Promise((done) => {
+          const tween = (now) => {
+            const progress = Math.min((now - start) / Math.max(duration, 1), 1);
+            spin = from + (target - from) * (1 - Math.pow(1 - progress, 3));
+            apply();
+            if (progress < 1) requestAnimationFrame(tween);
+            else done();
+          };
+          requestAnimationFrame(tween);
+        });
+        await Promise.all(slots.filter((other) => other !== slot).map((other) => animate(other, [
+          { opacity: other.style.opacity },
+          { opacity: 0 },
+        ], { duration: ms(220), fill: 'forwards' })));
+        resolve(slot);
+      }
+
+      ring.addEventListener('pointerdown', (event) => {
+        drag = {
+          x: event.clientX,
+          y: event.clientY,
+          spin,
+          time: event.timeStamp,
+          slot: event.target.closest('.pick-pack'),
+        };
+        velocity = 0;
+        ring.setPointerCapture(event.pointerId);
+      }, { signal });
+      ring.addEventListener('pointermove', (event) => {
+        if (!drag) return;
+        const next = drag.spin + (event.clientX - drag.x) * PICK_DRAG_RATIO;
+        const elapsed = Math.max(event.timeStamp - drag.time, 1) / 1000;
+        velocity = (next - spin) / elapsed;
+        drag.time = event.timeStamp;
+        spin = next;
+      }, { signal });
+      ring.addEventListener('pointerup', (event) => {
+        if (!drag) return;
+        const isTap = Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < TAP_DISTANCE;
+        const { slot } = drag;
+        drag = null;
+        resumeAt = performance.now() + 1500;
+        if (isTap && slot) {
+          velocity = 0;
+          choose(slot);
+        }
+      }, { signal });
+      ring.addEventListener('pointercancel', () => { drag = null; }, { signal });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+          spin += event.key === 'ArrowLeft' ? step : -step;
+          resumeAt = performance.now() + 1500;
+        } else if (NEXT_KEYS.has(event.key)) {
+          event.preventDefault();
+          choose(slots[(frontIndex() + PICK_COUNT) % PICK_COUNT]);
+        }
+      }, { signal });
+
+      apply();
+      animate(ring, [
+        { transform: 'translateY(40px) scale(.85)', opacity: 0 },
+        { transform: 'none', opacity: 1 },
+      ], { duration: ms(600), easing: EASE_BACK });
+      requestAnimationFrame(frame);
+    });
+  }
+
+  // Le booster choisi quitte la roue et grandit jusqu'au centre de l'écran.
+  async function bringForward(view, slot, packEl) {
+    const from = slot.querySelector('.pack').getBoundingClientRect();
+    view.stage.replaceChildren(packEl);
+    const to = packEl.getBoundingClientRect();
+    const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+    const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+    await animate(packEl, [
+      { transform: `translate(${dx}px, ${dy}px) scale(${from.width / to.width})` },
+      { transform: 'none' },
+    ], { duration: ms(520), easing: EASE_BACK });
   }
 
   // Glisser sur le booster trace la découpe ; une simple touche l'ouvre aussi.
@@ -315,9 +464,9 @@
     const view = {
       setName: set.name,
       counter: h('span', { class: 'opening-counter' }, set.name),
-      stage: h('div', { class: 'opening-stage' }, packEl),
+      stage: h('div', { class: 'opening-stage' }),
       caption: h('div', { class: 'opening-caption is-hidden', 'aria-live': 'polite' }),
-      hint: h('p', { class: 'opening-hint' }, 'Glisse sur le booster pour le déchirer'),
+      hint: h('p', { class: 'opening-hint' }, 'Choisis ton booster'),
       fx: h('div', { class: 'opening-fx', 'aria-hidden': 'true' }),
       flash: h('div', { class: 'opening-flash', 'aria-hidden': 'true' }),
     };
@@ -337,17 +486,18 @@
     document.body.append(view.overlay);
     document.body.classList.add('is-locked');
     Sound.setDucked(true);
-    Sound.play('packPickUp');
+    Sound.play('fan');
     const imagesReady = preload(pack.map(OPP.Cards.imageOf), 6000);
 
-    await Promise.all([
-      animate(view.overlay, [{ opacity: 0 }, { opacity: 1 }], { duration: ms(260) }),
-      animate(packEl, [
-        { transform: 'translateY(60px) scale(.6) rotate(-8deg)', opacity: 0 },
-        { transform: 'none', opacity: 1 },
-      ], { duration: ms(600), easing: EASE_BACK }),
-    ]);
-    if ((await race(skip, (signal) => tearGesture(packEl, signal))) !== SKIP) {
+    animate(view.overlay, [{ opacity: 0 }, { opacity: 1 }], { duration: ms(260) });
+    const picked = await race(skip, (signal) => pickPack(view, booster, signal));
+    if (picked !== SKIP) {
+      Sound.play('packPickUp');
+      view.hint.textContent = '';
+      await bringForward(view, picked, packEl);
+      view.hint.textContent = 'Glisse sur le booster pour le déchirer';
+    }
+    if (picked !== SKIP && (await race(skip, (signal) => tearGesture(packEl, signal))) !== SKIP) {
       const stackEls = await tearOpen(view, packEl, pack, newIds, imagesReady);
       await revealCards(view, stackEls, pack, newIds, skip);
     }

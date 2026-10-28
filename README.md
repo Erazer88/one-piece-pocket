@@ -10,6 +10,8 @@ Prototype web sans framework ni dépendance : ouvrir `index.html` dans un naviga
 - **Accueil** : fais défiler les 20 boosters (OP-01 à OP-17 et Extra Boosters EB-01 à
   EB-03), puis touche « Ouvrir ». Un booster gratuit se recharge toutes les 6 heures,
   avec jusqu'à 2 boosters en réserve ; le sablier affiche le compte à rebours.
+- **Choix** : 10 boosters identiques tournent sur une roue ; fais-la tourner du doigt et
+  touche celui qui te plaît. Le contenu est tiré à l'avance : le choix est visuel.
 - **Ouverture** : glisse le doigt sur le haut du booster pour le découper, puis glisse
   chaque carte. Les Leaders et Super Rares arrivent face cachée, comme les cartes
   spéciales (SEC, parallèles, SP, manga…) : touche-les pour les révéler.
@@ -78,23 +80,26 @@ projet de fan non commercial.
 
 Un booster contient 6 cartes, comme un booster japonais : 3 C, 1 UC, 1 R et une
 dernière carte tirée selon le tableau ci-dessous (les Extra Boosters, sans peu
-communes, ont 4 C). Bandai ne publie pas de taux officiels : ce sont des moyennes par
-boîte de 24 boosters observées par la communauté
+communes, ont 4 C). Bandai ne publie pas de taux officiels : les taux partent des
+moyennes par boîte de 24 boosters observées par la communauté
 ([onepiece.app](https://onepiece.app/set/OP01)), appliquées à toutes les extensions.
+À partir de la Secret Rare, ils sont **triplés** (`RARE_BOOST` dans
+`src/data/boosters.js`) pour rester atteignables avec un booster toutes les 6 heures.
 
-| Par boîte (24 boosters) | Visé |
-| --- | --- |
-| Rare (R) | 26 |
-| Super Rare (SR) | 7 |
-| Leader (L) | 5 |
-| Parallèle L/SR/R | 2 |
-| Secret Rare (SEC) | 1 boîte sur 3 |
-| SP | 1 boîte sur 6 |
-| SEC parallèle | 1 boîte sur 10 |
-| Treasure Rare | 1 boîte sur 12 |
-| Super Parallèle | 1 boîte sur 32 |
-| Manga | 1 boîte sur 48 |
-| Or / argent | 1 boîte sur 500 |
+| 6e carte | Par boîte réelle | Dans le jeu | Par booster |
+| --- | --- | --- | --- |
+| Super Rare (SR) | 7 | 7 | 29,2 % |
+| Leader (L) | 5 | 5 | 20,8 % |
+| Rare (R) | 2 (+ 24 garanties) | 2 | 8,3 % |
+| Parallèle L/SR/R | 2 | 2 | 8,3 % |
+| Secret Rare (SEC) | 1 boîte sur 3 | 1 par boîte | 4,2 % (1 sur 24) |
+| SP | 1 boîte sur 6 | 1 boîte sur 2 | 2,1 % (1 sur 48) |
+| SEC parallèle | 1 boîte sur 10 | 3 boîtes sur 10 | 1,25 % (1 sur 80) |
+| Treasure Rare | 1 boîte sur 12 | 1 boîte sur 4 | 1,04 % (1 sur 96) |
+| Super Parallèle | 1 boîte sur 32 | 3 boîtes sur 32 | 0,39 % (1 sur 256) |
+| Manga | 1 boîte sur 48 | 1 boîte sur 16 | 0,26 % (1 sur 384) |
+| Or / argent | 1 boîte sur 500 | 3 boîtes sur 500 | 0,025 % (1 sur 4 000) |
+| Peu commune (sinon) | — | — | 24,1 % |
 
 Quand une extension n'a pas une variante (pas de manga, par exemple), la dernière carte
 devient une peu commune (une commune dans les Extra Boosters).
