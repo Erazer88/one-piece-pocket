@@ -44,22 +44,37 @@
     }
   }
 
-  function load(storage) {
+  // Validation des données relues (stockage local ou sauvegarde en ligne).
+  function cleanCollection(value) {
     const collection = {};
-    for (const [id, count] of Object.entries(read(storage, COLLECTION_KEY))) {
+    for (const [id, count] of Object.entries(value && typeof value === 'object' ? value : {})) {
       if (Number.isInteger(count) && count > 0) collection[id] = count;
     }
     return collection;
   }
 
-  function loadStats(storage) {
-    const saved = read(storage, STATS_KEY);
-    const count = (value) => (Number.isInteger(value) && value > 0 ? value : 0);
+  function cleanStats(value) {
+    const saved = value && typeof value === 'object' ? value : {};
+    const count = (number) => (Number.isInteger(number) && number > 0 ? number : 0);
     return {
       packsOpened: count(saved.packsOpened),
       cardsPulled: count(saved.cardsPulled),
       lastPack: Array.isArray(saved.lastPack) ? saved.lastPack.filter((id) => typeof id === 'string') : [],
     };
+  }
+
+  function cleanTimer(value) {
+    return value && Number.isFinite(value.charges) && Number.isFinite(value.since)
+      ? { charges: value.charges, since: value.since }
+      : null;
+  }
+
+  function load(storage) {
+    return cleanCollection(read(storage, COLLECTION_KEY));
+  }
+
+  function loadStats(storage) {
+    return cleanStats(read(storage, STATS_KEY));
   }
 
   function save(storage, collection, stats) {
@@ -68,17 +83,17 @@
   }
 
   function loadTimer(storage) {
-    const saved = read(storage, TIMER_KEY);
-    return Number.isFinite(saved.charges) && Number.isFinite(saved.since) ? saved : null;
+    return cleanTimer(read(storage, TIMER_KEY));
   }
 
   function saveTimer(storage, timer) {
     write(storage, TIMER_KEY, timer);
   }
 
-  // Efface la collection et les statistiques ; la recharge des boosters est conservée.
-  function clear(storage) {
-    for (const key of [COLLECTION_KEY, STATS_KEY]) {
+  // Efface la collection et les statistiques ; la recharge des boosters est conservée,
+  // sauf avec `withTimer` (déconnexion : l'appareil repart comme un nouvel invité).
+  function clear(storage, withTimer) {
+    for (const key of withTimer ? [COLLECTION_KEY, STATS_KEY, TIMER_KEY] : [COLLECTION_KEY, STATS_KEY]) {
       try {
         storage.removeItem(key);
       } catch (error) {
@@ -107,5 +122,19 @@
     return { owned, total: cards.length, ratio: cards.length ? owned / cards.length : 0 };
   }
 
-  OPP.Collection = { storage, load, loadStats, save, loadTimer, saveTimer, clear, add, record, progress };
+  OPP.Collection = {
+    storage,
+    cleanCollection,
+    cleanStats,
+    cleanTimer,
+    load,
+    loadStats,
+    save,
+    loadTimer,
+    saveTimer,
+    clear,
+    add,
+    record,
+    progress,
+  };
 })(globalThis);

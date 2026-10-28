@@ -22,6 +22,39 @@ Prototype web sans framework ni dépendance : ouvrir `index.html` dans un naviga
 Pour essayer les extensions sans attendre, ajoute `?test` à l'adresse : les boosters
 deviennent illimités. La collection est sauvegardée sur l'appareil (`localStorage`).
 
+## Sauvegarde en ligne
+
+Le joueur peut se connecter par e-mail (mot de passe) ou avec Google, depuis le bouton
+de compte en haut à droite ou l'écran Profil. La progression (collection, statistiques,
+recharge des boosters) est alors enregistrée sur son compte et retrouvée sur tous ses
+appareils.
+
+- La partie jouée en invité est fusionnée avec le compte à la première connexion.
+- Chaque booster ouvert est envoyé au serveur ; si un autre appareil a joué
+  entre-temps, les deux progressions sont fusionnées sans rien perdre ni dupliquer.
+  La recharge la plus restrictive est conservée.
+- À la déconnexion, l'appareil repart comme un nouvel invité ; la collection reste
+  sur le compte.
+- Sans configuration, la connexion est désactivée et le jeu reste jouable en invité.
+
+Le service utilisé est Firebase (Authentication + Firestore, offre gratuite). Pour
+l'activer :
+
+1. Créer un projet sur [console.firebase.google.com](https://console.firebase.google.com).
+2. **Authentication** > Sign-in method : activer « Adresse e-mail/Mot de passe » et
+   « Google ».
+3. **Authentication** > Paramètres > Domaines autorisés : ajouter `raw.githack.com`
+   (et le domaine de publication définitif).
+4. **Firestore Database** : créer la base en mode production, puis coller le contenu de
+   [`firestore.rules`](firestore.rules) dans l'onglet Règles et publier. Chaque joueur
+   ne peut lire et écrire que sa propre progression (`players/{uid}`).
+5. Paramètres du projet > Vos applications > ajouter une application Web, puis copier
+   l'objet `firebaseConfig` dans [`src/data/cloud-config.js`](src/data/cloud-config.js).
+   Ces valeurs sont publiques ; la sécurité repose sur les règles.
+
+Pour tester sans projet réel, l'émulateur Firebase fonctionne avec un `projectId` de
+démonstration et la clé `emulators` de la configuration (voir `src/cloud.js`).
+
 ## Son
 
 Une playlist de musiques chill d'ambiance mer et pirate démarre au premier toucher
@@ -49,6 +82,10 @@ crédits sont aussi affichés dans l'écran Profil.
 | `src/cards.js` | Niveau d'effet, score de rareté et libellés d'une carte. |
 | `src/collection.js` | Collection et statistiques du joueur, sauvegarde. |
 | `src/timer.js` | Recharge des boosters gratuits (pur, testé). |
+| `src/progress.js` | Progression sauvegardée en ligne : validation et fusion (pur, testé). |
+| `src/cloud.js` | Connexion et sauvegarde avec Firebase, chargé seulement s'il est configuré. |
+| `src/data/cloud-config.js` | Configuration Firebase (vide par défaut). |
+| `firestore.rules` | Règles de sécurité de la base Firestore. |
 | `src/ui/` | Interface : composants de carte, ouverture animée, son, écrans et modales. |
 | `src/app.js` | Initialisation et navigation entre les écrans. |
 
@@ -112,4 +149,4 @@ node --test
 
 Les tests vérifient la composition d'un booster, le déterminisme par graine, les
 moyennes par boîte sur 48 000 boosters simulés, l'ouverture de chaque extension, la
-recharge des boosters et la sauvegarde de la collection.
+recharge des boosters, la sauvegarde de la collection et la fusion des progressions.

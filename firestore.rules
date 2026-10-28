@@ -1,0 +1,10 @@
+rules_version = '2';
+
+// Chaque joueur ne peut lire et écrire que sa propre progression : players/{uid}.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /players/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

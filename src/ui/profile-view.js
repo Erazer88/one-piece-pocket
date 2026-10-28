@@ -26,6 +26,20 @@
     );
   }
 
+  function accountCard(ctx) {
+    const { user, sync } = ctx.account.info();
+    return h('button', { class: 'account-card', type: 'button', onclick: ctx.openAccount },
+      OPP.AccountPanel.avatar(user),
+      h('span', { class: 'account-card-text' },
+        h('strong', {}, user ? user.name || user.email : 'Invité'),
+        h('small', {}, user
+          ? OPP.AccountPanel.syncLabel(sync) || 'Connecté'
+          : 'Connecte-toi pour sauvegarder ta collection'),
+      ),
+      h('span', { class: 'account-card-arrow', 'aria-hidden': 'true' }, '›'),
+    );
+  }
+
   function creditList(items) {
     return h('ul', { class: 'credits' }, items.map((item) => h('li', {},
       h('a', { href: item.url, target: '_blank', rel: 'noopener' }, item.title),
@@ -44,6 +58,7 @@
 
     return h('section', { class: 'view view-profile' },
       h('header', { class: 'view-header' }, h('h2', { class: 'view-title' }, 'Profil')),
+      accountCard(ctx),
       h('div', { class: 'stat-grid' },
         stat(stats.packsOpened, 'Boosters'),
         stat(progress.owned, 'Cartes'),
