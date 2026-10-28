@@ -174,6 +174,9 @@
     element.addEventListener('ended', nextTrack);
     // Passer par Web Audio permet de régler le volume sur iPhone, où l'élément l'ignore.
     if (state.context) {
+      // RawGithack redirige les MP3 vers raw.githubusercontent.com : sans requête CORS,
+      // Web Audio rendrait la musique muette.
+      element.crossOrigin = 'anonymous';
       try {
         const source = state.context.createMediaElementSource(element);
         state.musicGain = state.context.createGain();
