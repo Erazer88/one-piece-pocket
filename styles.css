@@ -152,37 +152,6 @@ img {
   gap: 8px;
 }
 
-/* Point d'état de la sauvegarde sur le bouton du compte. */
-.account-button {
-  position: relative;
-  overflow: visible;
-}
-
-.account-button::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 11px;
-  height: 11px;
-  border: 2px solid var(--surface);
-  border-radius: 50%;
-  background: transparent;
-}
-
-.account-button[data-sync='saved']::after {
-  background: #2fb36d;
-}
-
-.account-button[data-sync='pending']::after,
-.account-button[data-sync='saving']::after {
-  background: var(--gold);
-}
-
-.account-button[data-sync='error']::after {
-  background: var(--danger);
-}
-
 .avatar {
   display: grid;
   place-items: center;
@@ -190,21 +159,15 @@ img {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  object-fit: cover;
   background: linear-gradient(135deg, var(--accent-light), var(--accent));
   color: #fff;
   font-size: 0.95rem;
   font-weight: 900;
 }
 
-.avatar svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+/* Le jeu n'apparaît qu'une fois le joueur connecté. */
+body:not(.is-signed-in) .app {
+  display: none;
 }
 
 .view-root {
@@ -1623,7 +1586,82 @@ img {
   color: var(--accent);
 }
 
-/* ---------- Compte ---------- */
+/* ---------- Accès et compte ---------- */
+
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  padding: calc(env(safe-area-inset-top) + 20px) 20px calc(env(safe-area-inset-bottom) + 20px);
+  overflow-y: auto;
+}
+
+.login-card {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 380px);
+  padding: 28px 22px 22px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.login-logo {
+  justify-self: center;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgb(47 120 227 / 25%);
+}
+
+.login-title {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.login-title strong {
+  color: var(--text);
+  font-weight: 900;
+}
+
+.login-intro {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.field {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+  box-shadow: inset 0 0 0 1.5px transparent;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+.field:focus {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.form-message {
+  min-height: 1.2em;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.form-message.is-error {
+  color: var(--danger);
+}
 
 .account-card {
   display: flex;
@@ -1652,13 +1690,6 @@ img {
   min-width: 0;
 }
 
-.account-card-text strong,
-.account-card-text small {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
 .account-card-text small {
   color: var(--muted);
   font-size: 0.8rem;
@@ -1668,105 +1699,6 @@ img {
   color: var(--faint);
   font-size: 1.6rem;
   line-height: 1;
-}
-
-.account-panel h3 {
-  margin: 0 0 8px;
-  font-size: 1.15rem;
-  font-weight: 900;
-}
-
-.account-intro,
-.account-note {
-  margin: 0 0 18px;
-  color: var(--muted);
-  font-size: 0.88rem;
-  line-height: 1.45;
-}
-
-.account-note {
-  margin: 12px 0 0;
-  font-size: 0.8rem;
-}
-
-.btn-google {
-  gap: 10px;
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: inset 0 0 0 1.5px var(--border);
-}
-
-.btn-google svg {
-  width: 20px;
-  height: 20px;
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 16px 0;
-  color: var(--faint);
-  font-size: 0.8rem;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border);
-}
-
-.account-form {
-  display: grid;
-  gap: 10px;
-}
-
-.field {
-  width: 100%;
-  min-height: 50px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 14px;
-  background: var(--surface-muted);
-  color: var(--text);
-  font: inherit;
-  font-size: 1rem;
-  outline: none;
-  box-shadow: inset 0 0 0 1.5px transparent;
-  transition: box-shadow 0.2s, background 0.2s;
-}
-
-.field:focus {
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1.5px var(--accent);
-}
-
-.link-button {
-  justify-self: center;
-  padding: 6px 10px;
-  border: 0;
-  background: none;
-  color: var(--accent);
-  font-size: 0.85rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.form-message {
-  min-height: 1.2em;
-  margin: 10px 0 0;
-  font-size: 0.85rem;
-}
-
-.form-message.is-error,
-.sync-line.is-error {
-  color: var(--danger);
-}
-
-.form-message.is-success {
-  color: #1f9a5a;
 }
 
 .account-head {
@@ -1784,14 +1716,6 @@ img {
 
 .account-head div {
   display: grid;
-  min-width: 0;
-}
-
-.account-head strong,
-.account-head small {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .account-head small {
@@ -1799,11 +1723,11 @@ img {
   font-size: 0.82rem;
 }
 
-.sync-line {
-  min-height: 1.2em;
-  margin: 14px 0;
+.account-note {
+  margin: 14px 0 16px;
   color: var(--muted);
   font-size: 0.85rem;
+  line-height: 1.45;
   text-align: left;
 }
 

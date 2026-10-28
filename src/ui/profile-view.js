@@ -27,14 +27,11 @@
   }
 
   function accountCard(ctx) {
-    const { user, sync } = ctx.account.info();
     return h('button', { class: 'account-card', type: 'button', onclick: ctx.openAccount },
-      OPP.AccountPanel.avatar(user),
+      OPP.AccountPanel.avatar(ctx.username),
       h('span', { class: 'account-card-text' },
-        h('strong', {}, user ? user.name || user.email : 'Invité'),
-        h('small', {}, user
-          ? OPP.AccountPanel.syncLabel(sync) || 'Connecté'
-          : 'Connecte-toi pour sauvegarder ta collection'),
+        h('strong', {}, ctx.username),
+        h('small', {}, 'Progression enregistrée sur cet appareil'),
       ),
       h('span', { class: 'account-card-arrow', 'aria-hidden': 'true' }, '›'),
     );
