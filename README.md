@@ -3,6 +3,8 @@
 Jeu mobile de collection de cartes One Piece, inspiré de Pokémon TCG Pocket : pas de
 combat, on ouvre des boosters pour compléter sa collection.
 
+Jouer : **https://erazer88.github.io/one-piece-pocket/** (GitHub Pages, branche `main`).
+
 Prototype web sans framework ni dépendance : ouvrir `index.html` dans un navigateur.
 
 ## Jouer
