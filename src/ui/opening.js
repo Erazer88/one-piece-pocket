@@ -274,11 +274,13 @@
     }
   }
 
-  function showSummary(view, pack, newIds, showCard) {
+  function showSummary(view, pack, newIds, showCard, canOpenAgain) {
     const newCount = pack.filter((card) => newIds.has(card.id)).length;
     const plural = newCount > 1 ? 's' : '';
-    const again = h('button', { class: 'btn btn-primary btn-block', type: 'button' }, 'Ouvrir un autre booster');
-    const done = h('button', { class: 'btn btn-ghost btn-block', type: 'button' }, 'Retour');
+    const again = canOpenAgain()
+      ? h('button', { class: 'btn btn-primary btn-block', type: 'button' }, 'Ouvrir un autre booster')
+      : null;
+    const done = h('button', { class: `btn ${again ? 'btn-ghost' : 'btn-primary'} btn-block`, type: 'button' }, 'Terminer');
     view.overlay.classList.remove('fx-super', 'fx-secret');
     view.overlay.classList.add('is-summary');
     Sound.play('fan');
@@ -286,7 +288,7 @@
     showCaption(view, null);
     view.hint.textContent = '';
     view.stage.replaceChildren(h('div', { class: 'summary' },
-      h('h2', { class: 'summary-title' }, 'Booster ouvert !'),
+      h('h2', { class: 'summary-title' }, 'Booster ouvert'),
       h('p', { class: 'summary-subtitle' }, newCount
         ? `${newCount} nouvelle${plural} carte${plural} pour ta collection`
         : 'Aucune nouvelle carte cette fois'),
@@ -300,15 +302,16 @@
       h('div', { class: 'summary-actions' }, again, done),
     ));
     return new Promise((resolve) => {
-      again.addEventListener('click', () => resolve('again'), { once: true });
+      if (again) again.addEventListener('click', () => resolve('again'), { once: true });
       done.addEventListener('click', () => resolve('close'), { once: true });
     });
   }
 
   // Joue l'ouverture complète et résout avec 'again' ou 'close'.
-  async function play({ set, pack, newIds, featured, showCard }) {
+  async function play({ booster, pack, newIds, showCard, canOpenAgain }) {
+    const set = OPP.sets[booster.set];
     const skip = createSkip();
-    const packEl = packElement(set, featured, pack.length);
+    const packEl = packElement(booster);
     const view = {
       setName: set.name,
       counter: h('span', { class: 'opening-counter' }, set.name),
@@ -327,7 +330,7 @@
       h('div', { class: 'opening-rays', 'aria-hidden': 'true' }),
       h('div', { class: 'opening-top' },
         view.counter,
-        h('button', { class: 'opening-skip', type: 'button', onclick: skip.trigger }, 'Tout voir'),
+        h('button', { class: 'opening-skip', type: 'button', onclick: skip.trigger }, 'Passer'),
       ),
       view.stage, view.caption, view.hint, view.fx, view.flash,
     );
@@ -335,7 +338,7 @@
     document.body.classList.add('is-locked');
     Sound.setDucked(true);
     Sound.play('packPickUp');
-    const imagesReady = preload(pack.map((card) => card.image), 6000);
+    const imagesReady = preload(pack.map(OPP.Cards.imageOf), 6000);
 
     await Promise.all([
       animate(view.overlay, [{ opacity: 0 }, { opacity: 1 }], { duration: ms(260) }),
@@ -349,7 +352,7 @@
       await revealCards(view, stackEls, pack, newIds, skip);
     }
     await imagesReady;
-    const choice = await showSummary(view, pack, newIds, showCard);
+    const choice = await showSummary(view, pack, newIds, showCard, canOpenAgain);
     await animate(view.overlay, [{ opacity: 1 }, { opacity: 0 }], { duration: ms(220), fill: 'forwards' });
     view.overlay.remove();
     document.body.classList.remove('is-locked');

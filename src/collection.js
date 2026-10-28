@@ -4,6 +4,7 @@
   const OPP = (root.OPP = root.OPP || {});
   const COLLECTION_KEY = 'opp.collection.v1';
   const STATS_KEY = 'opp.stats.v1';
+  const TIMER_KEY = 'opp.timer.v1';
 
   function memoryStorage() {
     const data = new Map();
@@ -66,6 +67,16 @@
     if (stats) write(storage, STATS_KEY, stats);
   }
 
+  function loadTimer(storage) {
+    const saved = read(storage, TIMER_KEY);
+    return Number.isFinite(saved.charges) && Number.isFinite(saved.since) ? saved : null;
+  }
+
+  function saveTimer(storage, timer) {
+    write(storage, TIMER_KEY, timer);
+  }
+
+  // Efface la collection et les statistiques ; la recharge des boosters est conservée.
   function clear(storage) {
     for (const key of [COLLECTION_KEY, STATS_KEY]) {
       try {
@@ -96,5 +107,5 @@
     return { owned, total: cards.length, ratio: cards.length ? owned / cards.length : 0 };
   }
 
-  OPP.Collection = { storage, load, loadStats, save, clear, add, record, progress };
+  OPP.Collection = { storage, load, loadStats, save, loadTimer, saveTimer, clear, add, record, progress };
 })(globalThis);

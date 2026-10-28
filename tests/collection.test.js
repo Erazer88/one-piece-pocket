@@ -1,14 +1,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-require('../src/data/cards-op01.js');
+require('../src/data/cards.js');
 require('../src/data/labels.js');
 require('../src/cards.js');
 require('../src/collection.js');
 
 const { OPP } = globalThis;
 const { Collection, Cards } = OPP;
-const cards = OPP.sets['OP-01'].cards;
+const cards = OPP.setOrder.flatMap((id) => OPP.sets[id].cards);
 const byId = (id) => cards.find((card) => card.id === id);
 
 function fakeStorage(initial = {}) {
@@ -54,4 +54,8 @@ test('les niveaux d\'effet suivent la rareté et les variantes', () => {
   assert.ok(Cards.scoreOf(byId('OP01-120_p2')) > Cards.scoreOf(byId('OP01-120_p1')));
   assert.equal(Cards.rarityLabel(byId('OP01-024_p1')), 'Super Rare Parallèle');
   assert.equal(Cards.colorLabel(byId('OP01-002')), 'Vert / Rouge');
+  assert.equal(Cards.tierOf(byId('OP01-008_p1')), 'common');
+  assert.equal(Cards.isCollectible(byId('OP01-008_p1')), false);
+  assert.equal(Cards.numberOf(byId('OP01-024_p1')), 'OP01-024');
+  assert.equal(Cards.imageOf(byId('OP01-024')), 'https://optcgapi.com/media/static/Card_Images/OP01-024.jpg');
 });

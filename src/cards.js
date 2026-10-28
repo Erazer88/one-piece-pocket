@@ -25,5 +25,19 @@
     return OPP.cardTypes[card.type] || card.type;
   }
 
-  OPP.Cards = { tierOf, scoreOf, rarityLabel, colorLabel, typeLabel };
+  function imageOf(card) {
+    return OPP.cardImageBase + (card.image || `${card.id}.jpg`);
+  }
+
+  // Numéro imprimé sur la carte (OP01-024), sans le suffixe de variante.
+  function numberOf(card) {
+    return card.id.replace(/_[a-z]\d+$/, '');
+  }
+
+  // Les promos (box toppers, dash packs…) ne sortent pas des boosters.
+  function isCollectible(card) {
+    return card.variant !== 'promo';
+  }
+
+  OPP.Cards = { tierOf, scoreOf, rarityLabel, colorLabel, typeLabel, imageOf, numberOf, isCollectible };
 })(globalThis);

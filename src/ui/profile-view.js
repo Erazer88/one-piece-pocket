@@ -1,21 +1,28 @@
-// Écran profil : statistiques, complétion par rareté et meilleures cartes.
+// Écran profil : statistiques, complétion par extension et meilleures cartes.
 (function (root) {
   const OPP = (root.OPP = root.OPP || {});
   const { h } = OPP.Dom;
   const { cardFace, progressBar } = OPP.CardView;
 
-  const RARITY_ROWS = ['L', 'SEC', 'SR', 'R', 'UC', 'C'];
-
   function stat(value, label) {
     return h('div', { class: 'stat' }, h('strong', {}, String(value)), h('span', {}, label));
   }
 
-  function rarityRow(label, cards, collection, tier) {
-    const progress = OPP.Collection.progress(cards, collection);
-    return h('div', { class: `rarity-row tier-${tier}` },
-      h('span', { class: 'rarity-row-label' }, label),
-      progressBar(progress.ratio, label),
-      h('span', { class: 'rarity-row-count' }, `${progress.owned}/${progress.total}`),
+  function setRow(setId, ctx) {
+    const set = OPP.sets[setId];
+    const progress = OPP.Collection.progress(ctx.collectibleOf(setId), ctx.state.collection);
+    return h('button', {
+      class: 'set-row',
+      type: 'button',
+      onclick: () => {
+        OPP.Sound.play('click');
+        ctx.showCollection(setId);
+      },
+    },
+      h('span', { class: 'set-row-code' }, set.code),
+      h('span', { class: 'set-row-name' }, set.name),
+      h('span', { class: 'set-row-count' }, `${progress.owned}/${progress.total}`),
+      progressBar(progress.ratio, set.name),
     );
   }
 
@@ -28,36 +35,19 @@
 
   function render(ctx) {
     const { collection, stats } = ctx.state;
-    const cards = ctx.collectible;
+    const cards = ctx.allCollectible;
     const progress = OPP.Collection.progress(cards, collection);
     const best = cards
       .filter((card) => collection[card.id])
       .sort((a, b) => OPP.Cards.scoreOf(b) - OPP.Cards.scoreOf(a))
-      .slice(0, 8);
+      .slice(0, 10);
 
     return h('section', { class: 'view view-profile' },
-      h('header', { class: 'view-header' },
-        h('div', {},
-          h('h2', { class: 'view-title' }, 'Profil'),
-          h('p', { class: 'view-subtitle' }, 'Tes statistiques de collectionneur'),
-        ),
-      ),
+      h('header', { class: 'view-header' }, h('h2', { class: 'view-title' }, 'Profil')),
       h('div', { class: 'stat-grid' },
         stat(stats.packsOpened, 'Boosters'),
-        stat(stats.cardsPulled, 'Cartes tirées'),
-        stat(`${Math.floor(progress.ratio * 100)}%`, 'Complétion'),
-      ),
-      h('section', { class: 'panel' },
-        h('h3', { class: 'panel-title' }, 'Par rareté'),
-        h('div', { class: 'rarity-rows' },
-          RARITY_ROWS.map((rarity) => rarityRow(
-            OPP.rarities[rarity].label,
-            cards.filter((card) => card.rarity === rarity && !card.variant),
-            collection,
-            OPP.rarities[rarity].tier,
-          )),
-          rarityRow('Parallèles', cards.filter((card) => card.variant), collection, 'secret'),
-        ),
+        stat(progress.owned, 'Cartes'),
+        stat(`${Math.floor(progress.ratio * 1000) / 10}%`, 'Complétion'),
       ),
       h('section', { class: 'panel' },
         h('h3', { class: 'panel-title' }, 'Meilleures cartes'),
@@ -69,6 +59,10 @@
             onclick: () => ctx.showCard(card),
           }, cardFace(card, { lazy: true }))))
           : h('p', { class: 'empty' }, 'Ouvre ton premier booster pour commencer ta collection.'),
+      ),
+      h('section', { class: 'panel' },
+        h('h3', { class: 'panel-title' }, 'Extensions'),
+        h('div', { class: 'set-rows' }, OPP.setOrder.map((setId) => setRow(setId, ctx))),
       ),
       h('section', { class: 'panel' },
         h('h3', { class: 'panel-title' }, 'Crédits audio'),

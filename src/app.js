@@ -1,52 +1,87 @@
-// Initialisation : état du joueur, navigation entre les écrans et ouverture des boosters.
+// Initialisation : état du joueur, recharge des boosters, navigation et ouverture.
 (function (root) {
   const { OPP, document } = root;
   const { animate, ms } = OPP.Dom;
+  const { Collection, PackTimer } = OPP;
 
-  const BOOSTER_ID = 'OP-01';
-  // Carte dont l'illustration décore le booster.
-  const FEATURED_CARD_ID = 'OP01-024';
+  const SELECTED_KEY = 'opp.booster';
+  // « ?test » dans l'adresse : boosters illimités pour essayer les extensions.
+  const unlimited = new URLSearchParams(root.location.search).has('test');
 
-  const booster = OPP.boosters[BOOSTER_ID];
-  const set = OPP.sets[booster.set];
-  const storage = OPP.Collection.storage();
+  const storage = Collection.storage();
   OPP.Sound.init(storage);
+
+  function savedBooster() {
+    try {
+      const id = storage.getItem(SELECTED_KEY);
+      return OPP.boosters[id] ? id : OPP.boosterOrder[0];
+    } catch (error) {
+      return OPP.boosterOrder[0];
+    }
+  }
+
+  const selectedBooster = savedBooster();
   const state = {
-    collection: OPP.Collection.load(storage),
-    stats: OPP.Collection.loadStats(storage),
+    collection: Collection.load(storage),
+    stats: Collection.loadStats(storage),
+    timer: PackTimer.refresh(Collection.loadTimer(storage), OPP.packTimer, Date.now()),
+    selectedBooster,
+    collectionSet: selectedBooster,
   };
-  const cardById = new Map(set.cards.map((card) => [card.id, card]));
+
+  const cardById = new Map();
+  const collectibleBySet = new Map();
+  const allCollectible = new Map();
+  for (const setId of OPP.setOrder) {
+    const cards = OPP.sets[setId].cards;
+    collectibleBySet.set(setId, cards.filter(OPP.Cards.isCollectible));
+    for (const card of cards) {
+      cardById.set(card.id, card);
+      if (OPP.Cards.isCollectible(card)) allCollectible.set(card.id, card);
+    }
+  }
+
   const views = { home: OPP.HomeView, collection: OPP.CollectionView, profile: OPP.ProfileView };
   const viewRoot = document.getElementById('view');
   const tabs = [...document.querySelectorAll('[data-tab]')];
-  const topbarCount = document.getElementById('topbar-count');
   let current = 'home';
   let opening = false;
 
   const ctx = {
-    set,
     state,
     cardById,
-    // Les box toppers ne sortent pas des boosters : ils ne comptent pas dans la collection.
-    collectible: set.cards.filter((card) => card.variant !== 'boxTopper'),
-    featured: cardById.get(FEATURED_CARD_ID),
-    packSize: OPP.Booster.packSize(BOOSTER_ID),
+    allCollectible: [...allCollectible.values()],
+    collectibleOf: (setId) => collectibleBySet.get(setId),
+    timerInfo,
+    selectBooster,
     openBooster,
     showCard,
+    showCollection,
     resetCollection,
   };
+
+  function timerInfo() {
+    state.timer = PackTimer.refresh(state.timer, OPP.packTimer, Date.now());
+    return {
+      unlimited,
+      charges: state.timer.charges,
+      nextAt: PackTimer.nextChargeAt(state.timer, OPP.packTimer),
+    };
+  }
+
+  function canOpen() {
+    return unlimited || timerInfo().charges > 0;
+  }
 
   function render(withTransition) {
     const view = views[current].render(ctx);
     viewRoot.replaceChildren(view);
     for (const tab of tabs) tab.setAttribute('aria-current', tab.dataset.tab === current ? 'page' : 'false');
-    const progress = OPP.Collection.progress(ctx.collectible, state.collection);
-    topbarCount.textContent = `${progress.owned}/${progress.total}`;
     if (withTransition) {
       animate(view, [
-        { opacity: 0, transform: 'translateY(12px)' },
+        { opacity: 0, transform: 'translateY(10px)' },
         { opacity: 1, transform: 'none' },
-      ], { duration: ms(240), easing: 'ease-out' });
+      ], { duration: ms(220), easing: 'ease-out' });
     }
   }
 
@@ -58,18 +93,45 @@
     render(true);
   }
 
-  async function openBooster() {
-    if (opening) return;
+  function selectBooster(id) {
+    state.selectedBooster = id;
+    state.collectionSet = id;
+    try {
+      storage.setItem(SELECTED_KEY, id);
+    } catch (error) {
+      // Choix non mémorisé : sans conséquence.
+    }
+  }
+
+  function showCollection(setId) {
+    state.collectionSet = setId;
+    if (current === 'collection') render();
+    else navigate('collection');
+  }
+
+  // Prend un booster dans la réserve ; faux s'il faut attendre la recharge.
+  function takePack() {
+    if (unlimited) return true;
+    const next = PackTimer.consume(state.timer, OPP.packTimer, Date.now());
+    if (!next) return false;
+    state.timer = next;
+    Collection.saveTimer(storage, state.timer);
+    return true;
+  }
+
+  async function openBooster(boosterId) {
+    if (opening || !takePack()) return;
     opening = true;
     try {
       let again = true;
       while (again) {
-        const pack = OPP.Booster.openPack(BOOSTER_ID);
-        const newIds = OPP.Collection.record(state.collection, state.stats, pack);
-        OPP.Collection.save(storage, state.collection, state.stats);
+        const booster = OPP.boosters[boosterId];
+        const pack = OPP.Booster.openPack(boosterId);
+        const newIds = Collection.record(state.collection, state.stats, pack);
+        Collection.save(storage, state.collection, state.stats);
         render();
-        const choice = await OPP.Opening.play({ set, pack, newIds, featured: ctx.featured, showCard });
-        again = choice === 'again';
+        const choice = await OPP.Opening.play({ booster, pack, newIds, showCard, canOpenAgain: canOpen });
+        again = choice === 'again' && takePack();
       }
     } finally {
       opening = false;
@@ -90,13 +152,18 @@
       danger: true,
     });
     if (!confirmed) return;
-    OPP.Collection.clear(storage);
+    Collection.clear(storage);
     state.collection = {};
-    state.stats = OPP.Collection.loadStats(storage);
+    state.stats = Collection.loadStats(storage);
     render();
   }
 
   for (const tab of tabs) tab.addEventListener('click', () => navigate(tab.dataset.tab));
   OPP.SoundPanel.bindButton(document.getElementById('sound-button'));
+  // Compte à rebours de la recharge.
+  setInterval(() => {
+    const view = viewRoot.firstElementChild;
+    if (view && views[current].update) views[current].update(ctx, view);
+  }, 1000);
   render();
 })(globalThis);

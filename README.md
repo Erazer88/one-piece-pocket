@@ -7,16 +7,18 @@ Prototype web sans framework ni dépendance : ouvrir `index.html` dans un naviga
 
 ## Jouer
 
-- **Boosters** : touche le booster, puis glisse le doigt sur le haut pour le déchirer.
-  Glisse chaque carte pour passer à la suivante. Les cartes brillantes (Leader, SR) et
-  exceptionnelles (SEC, parallèles, manga) arrivent face cachée : touche-les pour les
-  révéler. « Tout voir » saute directement au récapitulatif.
-- **Collection** : cartes obtenues et manquantes, filtres par rareté. Touche une carte
-  pour l'afficher en grand et l'incliner.
-- **Profil** : statistiques, complétion par rareté, meilleures cartes et
-  réinitialisation.
+- **Accueil** : fais défiler les 20 boosters (OP-01 à OP-17 et Extra Boosters EB-01 à
+  EB-03), puis touche « Ouvrir ». Un booster gratuit se recharge toutes les 6 heures,
+  avec jusqu'à 2 boosters en réserve ; le sablier affiche le compte à rebours.
+- **Ouverture** : glisse le doigt sur le haut du booster pour le découper, puis glisse
+  chaque carte. Les Leaders et Super Rares arrivent face cachée, comme les cartes
+  spéciales (SEC, parallèles, SP, manga…) : touche-les pour les révéler.
+- **Collection** : choisis l'extension, filtre par rareté, touche une carte pour
+  l'afficher en grand.
+- **Profil** : statistiques, meilleures cartes et progression par extension.
 
-La collection est sauvegardée sur l'appareil (`localStorage`).
+Pour essayer les extensions sans attendre, ajoute `?test` à l'adresse : les boosters
+deviennent illimités. La collection est sauvegardée sur l'appareil (`localStorage`).
 
 ## Son
 
@@ -36,14 +38,15 @@ crédits sont aussi affichés dans l'écran Profil.
 | Fichier | Rôle |
 | --- | --- |
 | `scripts/import-cards.mjs` | Importe une extension depuis [optcgapi.com](https://optcgapi.com) et génère `src/data/cards-<set>.js`. |
-| `src/data/cards-op01.js` | Cartes de OP-01 « Romance Dawn » (généré, ne pas éditer). |
+| `src/data/cards.js` | Cartes des 20 extensions (généré, ne pas éditer). |
 | `src/data/labels.js` | Libellés, rangs et niveaux d'effet des raretés et variantes. |
-| `src/data/boosters.js` | Composition des boosters et taux de drop (déclaratif). |
+| `src/data/boosters.js` | Composition des boosters, taux de drop et recharge (déclaratif). |
 | `src/data/audio.js` | Playlist, bruitages, volumes et crédits audio. |
 | `assets/audio/` | Musiques et bruitages libres de droits (MP3). |
 | `src/booster.js` | Tirage d'un booster, pur et déterministe si on lui passe une graine. |
 | `src/cards.js` | Niveau d'effet, score de rareté et libellés d'une carte. |
 | `src/collection.js` | Collection et statistiques du joueur, sauvegarde. |
+| `src/timer.js` | Recharge des boosters gratuits (pur, testé). |
 | `src/ui/` | Interface : composants de carte, ouverture animée, son, écrans et modales. |
 | `src/app.js` | Initialisation et navigation entre les écrans. |
 
@@ -54,14 +57,17 @@ le script d'import (le créateur demande de limiter les appels). Le jeu lit le f
 généré et ne contacte jamais l'API.
 
 ```sh
-node scripts/import-cards.mjs OP-01   # régénère src/data/cards-op01.js
+node scripts/import-cards.mjs          # toutes les extensions
+node scripts/import-cards.mjs OP-17    # une seule, les autres sont conservées
 ```
 
-OP-01 contient 121 cartes de base et 33 variantes :
+Le script nettoie les données de l'API : doublons, versions promo portant l'identifiant
+de la carte de base, cartes d'EB-04 mêlées à OP-14 et OP-15. Les Premium Boosters
+(PRB-01, PRB-02) sont exclus : ce sont des rééditions de cartes des autres extensions.
 
-- `parallel` : illustrations alternatives (L, SR, R, SEC), traitées comme cartes rares ;
-- `manga` : Shanks manga, la carte la plus rare ;
-- `boxTopper` : 6 cartes C/UC offertes avec les boîtes, absentes des boosters.
+Variantes reconnues : `parallel` (illustration alternative), `sp` (SP, SPR, Wanted
+Poster), `treasure`, `manga`, `superParallel` (Super Alternate Art), `gold` (versions
+or et argent) et `promo` (box toppers, dash packs… absents des boosters).
 
 Les images sont celles hébergées par l'API (les images du site Bandai bloquent
 l'affichage depuis un autre site). Elles ne sont pas copiées dans le dépôt. Les cartes et
@@ -70,10 +76,11 @@ projet de fan non commercial.
 
 ## Taux de drop
 
-Un booster contient 6 cartes, comme un booster japonais : 3 C, 1 UC, 1 R et un slot
-« hit ». Bandai ne publie pas de taux officiels. Les cartes rares visent les moyennes
-par boîte de 24 boosters observées par la communauté
-([onepiece.app](https://onepiece.app/set/OP01)) :
+Un booster contient 6 cartes, comme un booster japonais : 3 C, 1 UC, 1 R et une
+dernière carte tirée selon le tableau ci-dessous (les Extra Boosters, sans peu
+communes, ont 4 C). Bandai ne publie pas de taux officiels : ce sont des moyennes par
+boîte de 24 boosters observées par la communauté
+([onepiece.app](https://onepiece.app/set/OP01)), appliquées à toutes les extensions.
 
 | Par boîte (24 boosters) | Visé |
 | --- | --- |
@@ -82,10 +89,15 @@ par boîte de 24 boosters observées par la communauté
 | Leader (L) | 5 |
 | Parallèle L/SR/R | 2 |
 | Secret Rare (SEC) | 1 boîte sur 3 |
+| SP | 1 boîte sur 6 |
 | SEC parallèle | 1 boîte sur 10 |
-| Shanks manga | 1 boîte sur 48 |
+| Treasure Rare | 1 boîte sur 12 |
+| Super Parallèle | 1 boîte sur 32 |
+| Manga | 1 boîte sur 48 |
+| Or / argent | 1 boîte sur 500 |
 
-Le slot « hit » complète par une UC quand il ne donne pas de carte rare.
+Quand une extension n'a pas une variante (pas de manga, par exemple), la dernière carte
+devient une peu commune (une commune dans les Extra Boosters).
 
 ## Tests
 
@@ -94,4 +106,5 @@ node --test
 ```
 
 Les tests vérifient la composition d'un booster, le déterminisme par graine, les
-moyennes par boîte sur 48 000 boosters simulés et la sauvegarde de la collection.
+moyennes par boîte sur 48 000 boosters simulés, l'ouverture de chaque extension, la
+recharge des boosters et la sauvegarde de la collection.

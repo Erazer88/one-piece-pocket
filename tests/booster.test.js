@@ -1,7 +1,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-require('../src/data/cards-op01.js');
+require('../src/data/cards.js');
+require('../src/data/labels.js');
 require('../src/data/boosters.js');
 require('../src/booster.js');
 
@@ -10,10 +11,13 @@ const { createRng, resolvePool, openPack } = OPP.Booster;
 const booster = OPP.boosters['OP-01'];
 const cards = OPP.sets['OP-01'].cards;
 
-test('chaque pool du booster OP-01 contient des cartes', () => {
-  for (const slot of booster.slots) {
-    const pools = slot.perBox ? [...slot.perBox.map((e) => e.pool), slot.fill] : [slot.pool];
-    for (const pool of pools) assert.ok(resolvePool(cards, pool).length > 0);
+test('les slots fixes et le remplissage ont des cartes dans chaque extension', () => {
+  for (const boosterId of OPP.boosterOrder) {
+    const setCards = OPP.sets[boosterId].cards;
+    for (const slot of OPP.boosters[boosterId].slots) {
+      const pool = slot.perBox ? slot.fill : slot.pool;
+      assert.ok(resolvePool(setCards, pool).length > 0, `${boosterId} ${JSON.stringify(pool)}`);
+    }
   }
 });
 
@@ -35,11 +39,26 @@ test('le tirage est déterministe pour une graine donnée', () => {
   assert.notDeepEqual(ids(42), ids(43));
 });
 
-test('les box toppers ne sortent pas des boosters', () => {
+test('chaque extension ouvre des boosters de 6 cartes sans promo', () => {
   const rng = createRng(7);
-  for (let i = 0; i < 2000; i += 1) {
-    assert.ok(openPack('OP-01', rng).every((c) => c.variant !== 'boxTopper'));
+  for (const boosterId of OPP.boosterOrder) {
+    assert.equal(OPP.Booster.packSize(boosterId), 6);
+    for (let i = 0; i < 300; i += 1) {
+      const pack = openPack(boosterId, rng);
+      assert.equal(pack.length, 6, boosterId);
+      assert.equal(new Set(pack.map((c) => c.id)).size, 6, boosterId);
+      assert.ok(pack.every((c) => c.variant !== 'promo' && OPP.rarities[c.rarity]), boosterId);
+    }
   }
+});
+
+test('les variantes rares sortent dans les extensions qui en ont', () => {
+  const rng = createRng(11);
+  const seen = new Set();
+  for (let i = 0; i < 24 * 600; i += 1) {
+    for (const card of openPack('OP-13', rng)) if (card.variant) seen.add(card.variant);
+  }
+  for (const variant of ['parallel', 'sp', 'treasure', 'superParallel']) assert.ok(seen.has(variant), variant);
 });
 
 test('les moyennes par boîte suivent les taux visés', () => {

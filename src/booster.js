@@ -32,12 +32,16 @@
     return result;
   }
 
-  function pickPool(slot, packsPerBox, rng) {
+  function hasCards(cards, pool) {
+    return cards.some((card) => matches(card, pool));
+  }
+
+  function pickPool(slot, packsPerBox, rng, cards) {
     if (!slot.perBox) return slot.pool;
     let roll = rng() * packsPerBox;
     for (const entry of slot.perBox) {
       roll -= entry.amount;
-      if (roll < 0) return entry.pool;
+      if (roll < 0) return hasCards(cards, entry.pool) ? entry.pool : slot.fill;
     }
     return slot.fill;
   }
@@ -57,7 +61,7 @@
     const pack = [];
     for (const slot of booster.slots) {
       for (let i = 0; i < slot.count; i += 1) {
-        const pool = resolvePool(cards, pickPool(slot, booster.packsPerBox, rng));
+        const pool = resolvePool(cards, pickPool(slot, booster.packsPerBox, rng, cards));
         const card = pickCard(pool, drawn, rng);
         drawn.add(card.id);
         pack.push(card);

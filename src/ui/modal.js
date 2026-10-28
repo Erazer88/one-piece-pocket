@@ -68,7 +68,7 @@
       h('button', { class: 'modal-close', type: 'button', 'aria-label': 'Fermer', onclick: () => modal.close() }, '×'),
       tilt,
       h('div', { class: 'card-info' },
-        h('p', { class: 'card-info-number' }, card.number),
+        h('p', { class: 'card-info-number' }, Cards.numberOf(card)),
         h('h3', {}, card.name),
         rarityPill(card),
         h('dl', {},

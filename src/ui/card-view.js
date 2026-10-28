@@ -4,15 +4,15 @@
   const { h } = OPP.Dom;
 
   const BURST_COLORS = {
-    super: ['#ffd76a', '#fff1b8', '#ffb72b', '#ffffff'],
-    secret: ['#ff5fa2', '#ffd84d', '#5ff3a0', '#5fd0ff', '#b47bff', '#ffffff'],
+    super: ['#f2c94c', '#ffe7a3', '#f5b83d', '#ffffff'],
+    secret: ['#ff8fc2', '#ffd96b', '#7ee8b8', '#7cc8ff', '#c3a2ff', '#ffffff'],
   };
 
   function cardFace(card, options = {}) {
     const tier = OPP.Cards.tierOf(card);
     return h('div', { class: `card tier-${tier}` },
       h('img', {
-        src: card.image,
+        src: OPP.Cards.imageOf(card),
         alt: card.name,
         loading: options.lazy ? 'lazy' : null,
         decoding: 'async',
@@ -38,18 +38,31 @@
     );
   }
 
-  function packElement(set, featured, cardCount) {
-    return h('div', { class: 'pack' },
-      h('div', { class: 'pack-top' }, h('span', { class: 'pack-top-label' }, set.id)),
+  // Nom affiché sur le booster, sans le préfixe « Extra Booster: ».
+  function packTitle(set) {
+    return set.name.replace(/^Extra Booster:\s*/i, '');
+  }
+
+  function packElement(booster, options = {}) {
+    const set = OPP.sets[booster.set];
+    const featured = set.cards.find((card) => card.id === set.featured);
+    return h('div', {
+      class: 'pack',
+      style: { '--pack-a': booster.palette[0], '--pack-b': booster.palette[1] },
+    },
+      h('div', { class: 'pack-top' }, h('span', { class: 'pack-top-label' }, set.code)),
       h('div', { class: 'pack-body' },
-        featured
-          ? h('div', { class: 'pack-art' }, h('img', { src: featured.image, alt: '', draggable: 'false' }))
-          : null,
+        h('div', { class: 'pack-art' }, h('img', {
+          src: OPP.Cards.imageOf(featured),
+          alt: '',
+          draggable: 'false',
+          loading: options.lazy ? 'lazy' : null,
+        })),
         h('div', { class: 'pack-title' },
-          h('span', { class: 'pack-brand' }, 'One Piece'),
-          h('strong', {}, set.name),
+          h('span', { class: 'pack-brand' }, 'One Piece Card Game'),
+          h('strong', {}, packTitle(set)),
         ),
-        h('div', { class: 'pack-meta' }, `${set.id} · ${cardCount} cartes`),
+        h('div', { class: 'pack-meta' }, `${OPP.Booster.packSize(booster.id)} cartes`),
       ),
       h('div', { class: 'pack-cut', 'aria-hidden': 'true' }),
     );
@@ -110,5 +123,5 @@
     return Promise.race([Promise.all(loads), OPP.Dom.wait(timeout)]);
   }
 
-  OPP.CardView = { cardFace, cardBack, flipCard, packElement, rarityPill, progressBar, burst, preload };
+  OPP.CardView = { cardFace, cardBack, flipCard, packTitle, packElement, rarityPill, progressBar, burst, preload };
 })(globalThis);
