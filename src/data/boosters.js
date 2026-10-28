@@ -4,16 +4,17 @@
   const OPP = (root.OPP = root.OPP || {});
   OPP.boosters = OPP.boosters || {};
 
-  // Une boîte réelle contient 24 boosters : les taux du slot « hit » sont exprimés
-  // en cartes par boîte, le reste du slot est complété par `fill`.
+  // 6 cartes par booster, comme les boosters japonais. Une boîte réelle contient
+  // 24 boosters : les taux du slot « hit » sont exprimés en cartes par boîte, le reste
+  // du slot est complété par `fill`.
   OPP.boosters['OP-01'] = {
     id: 'OP-01',
     set: 'OP-01',
     name: 'Romance Dawn',
     packsPerBox: 24,
     slots: [
-      { count: 7, pool: { rarity: 'C' } },
-      { count: 3, pool: { rarity: 'UC' } },
+      { count: 3, pool: { rarity: 'C' } },
+      { count: 1, pool: { rarity: 'UC' } },
       { count: 1, pool: { rarity: 'R' } },
       {
         count: 1,

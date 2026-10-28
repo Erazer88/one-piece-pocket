@@ -5,16 +5,32 @@ combat, on ouvre des boosters pour compléter sa collection.
 
 Prototype web sans framework ni dépendance : ouvrir `index.html` dans un navigateur.
 
+## Jouer
+
+- **Boosters** : touche le booster, puis glisse le doigt sur le haut pour le déchirer.
+  Glisse chaque carte pour passer à la suivante. Les cartes brillantes (Leader, SR) et
+  exceptionnelles (SEC, parallèles, manga) arrivent face cachée : touche-les pour les
+  révéler. « Tout voir » saute directement au récapitulatif.
+- **Collection** : cartes obtenues et manquantes, filtres par rareté. Touche une carte
+  pour l'afficher en grand et l'incliner.
+- **Profil** : statistiques, complétion par rareté, meilleures cartes et
+  réinitialisation.
+
+La collection est sauvegardée sur l'appareil (`localStorage`).
+
 ## Organisation
 
 | Fichier | Rôle |
 | --- | --- |
 | `scripts/import-cards.mjs` | Importe une extension depuis [optcgapi.com](https://optcgapi.com) et génère `src/data/cards-<set>.js`. |
 | `src/data/cards-op01.js` | Cartes de OP-01 « Romance Dawn » (généré, ne pas éditer). |
+| `src/data/labels.js` | Libellés, rangs et niveaux d'effet des raretés et variantes. |
 | `src/data/boosters.js` | Composition des boosters et taux de drop (déclaratif). |
 | `src/booster.js` | Tirage d'un booster, pur et déterministe si on lui passe une graine. |
-| `src/collection.js` | Collection du joueur, sauvegardée dans `localStorage`. |
-| `src/app.js` | Page de test : ouvrir un booster et voir la collection. |
+| `src/cards.js` | Niveau d'effet, score de rareté et libellés d'une carte. |
+| `src/collection.js` | Collection et statistiques du joueur, sauvegarde. |
+| `src/ui/` | Interface : composants de carte, ouverture animée, écrans et modales. |
+| `src/app.js` | Initialisation et navigation entre les écrans. |
 
 ## Cartes
 
@@ -39,9 +55,9 @@ projet de fan non commercial.
 
 ## Taux de drop
 
-Un booster contient 12 cartes, comme un booster anglais : 7 C, 3 UC, 1 R et un slot
-« hit ». Bandai ne publie pas de taux officiels. Les taux visent les moyennes par
-boîte de 24 boosters observées par la communauté
+Un booster contient 6 cartes, comme un booster japonais : 3 C, 1 UC, 1 R et un slot
+« hit ». Bandai ne publie pas de taux officiels. Les cartes rares visent les moyennes
+par boîte de 24 boosters observées par la communauté
 ([onepiece.app](https://onepiece.app/set/OP01)) :
 
 | Par boîte (24 boosters) | Visé |
@@ -62,5 +78,5 @@ Le slot « hit » complète par une UC quand il ne donne pas de carte rare.
 node --test
 ```
 
-Les tests vérifient la composition d'un booster, le déterminisme par graine et les
-moyennes par boîte sur 48 000 boosters simulés.
+Les tests vérifient la composition d'un booster, le déterminisme par graine, les
+moyennes par boîte sur 48 000 boosters simulés et la sauvegarde de la collection.

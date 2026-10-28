@@ -66,5 +66,9 @@
     return pack;
   }
 
-  OPP.Booster = { createRng, resolvePool, openPack };
+  function packSize(boosterId) {
+    return OPP.boosters[boosterId].slots.reduce((total, slot) => total + slot.count, 0);
+  }
+
+  OPP.Booster = { createRng, resolvePool, openPack, packSize };
 })(globalThis);

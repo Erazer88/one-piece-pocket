@@ -17,13 +17,15 @@ test('chaque pool du booster OP-01 contient des cartes', () => {
   }
 });
 
-test('un booster contient 12 cartes distinctes, la plus rare en dernier', () => {
+test('un booster contient 6 cartes distinctes, la plus rare en dernier', () => {
   const rng = createRng(1);
   for (let i = 0; i < 500; i += 1) {
     const pack = openPack('OP-01', rng);
-    assert.equal(pack.length, 12);
-    assert.equal(new Set(pack.map((c) => c.id)).size, 12);
-    assert.deepEqual(pack.slice(0, 7).map((c) => c.rarity), Array(7).fill('C'));
+    assert.equal(pack.length, 6);
+    assert.equal(OPP.Booster.packSize('OP-01'), 6);
+    assert.equal(new Set(pack.map((c) => c.id)).size, 6);
+    assert.deepEqual(pack.slice(0, 3).map((c) => c.rarity), ['C', 'C', 'C']);
+    assert.ok(pack.slice(0, 5).every((c) => !c.variant));
   }
 });
 
