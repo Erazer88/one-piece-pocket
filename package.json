@@ -1,0 +1,10 @@
+{
+  "name": "one-piece-pocket",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Jeu mobile de collection de cartes One Piece, inspiré de Pokémon TCG Pocket.",
+  "scripts": {
+    "import-cards": "node scripts/import-cards.mjs",
+    "test": "node --test"
+  }
+}
