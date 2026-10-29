@@ -43,6 +43,12 @@ puis copier la ligne affichée dans `OPP.accounts`.
 - La vérification se fait dans le navigateur et le dépôt est public : c'est un écran
   d'accès, pas une protection. Elle demande une page sécurisée (https ou localhost).
 
+## Introduction
+
+À chaque ouverture, l'appli affiche « par amour, pour mini » : un toucher lance la
+musique, le texte apparaît, un cœur se dessine, puis un cercle se referme sur lui pour
+révéler le menu. Un second toucher passe l'introduction.
+
 ## Son
 
 Une playlist de musiques chill d'ambiance mer et pirate démarre au premier toucher
@@ -52,7 +58,10 @@ glissement, révélation des cartes rares et récapitulatif. Le bouton haut-parl
 haut de l'écran coupe la musique ou les effets et passe à la piste suivante.
 
 Ce ne sont pas les musiques officielles de One Piece : elles sont protégées et ne
-peuvent pas être publiées dans ce dépôt. Toutes les pistes sont libres de droits
+peuvent pas être publiées dans ce dépôt. Pour en écouter une, le panneau Son permet
+d'importer un fichier audio du téléphone comme **musique du menu** : il est joué en
+boucle à la place de la playlist et reste enregistré sur l'appareil (IndexedDB), sans
+jamais être envoyé ni publié. Toutes les pistes sont libres de droits
 (CC0 ou CC-BY) ; voir [`assets/audio/CREDITS.md`](assets/audio/CREDITS.md). Les
 crédits sont aussi affichés dans l'écran Profil.
 
@@ -72,7 +81,8 @@ crédits sont aussi affichés dans l'écran Profil.
 | `src/timer.js` | Recharge des boosters gratuits (pur, testé). |
 | `src/data/accounts.js` | Comptes autorisés (identifiant et empreinte du mot de passe). |
 | `src/auth.js` | Vérification de l'accès, session et progression par compte. |
-| `src/ui/` | Interface : composants de carte, ouverture animée, son, écrans et modales. |
+| `src/music-store.js` | Musique du menu importée, gardée sur l'appareil (IndexedDB). |
+| `src/ui/` | Interface : introduction, cartes, ouverture animée, son, écrans et modales. |
 | `src/app.js` | Initialisation et navigation entre les écrans. |
 
 ## Cartes

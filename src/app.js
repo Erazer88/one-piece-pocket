@@ -10,6 +10,7 @@
 
   const deviceStorage = Collection.storage();
   OPP.Sound.init(deviceStorage);
+  OPP.Intro.show();
 
   // Lance le jeu pour un compte connecté ; sa progression est rangée à part.
   function start(username) {

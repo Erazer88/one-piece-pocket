@@ -35,6 +35,11 @@
   box-sizing: border-box;
 }
 
+/* Les classes d'affichage (boutons…) ne doivent pas faire réapparaître un élément masqué. */
+[hidden] {
+  display: none !important;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
 }
@@ -1731,6 +1736,166 @@ body:not(.is-signed-in) .app {
   text-align: left;
 }
 
+/* ---------- Introduction ---------- */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: radial-gradient(120% 70% at 50% 30%, #ffffff 0%, #fdeef3 38%, #e7f1fc 75%, #d5e6f8 100%);
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Vagues au bas de l'écran et bulles qui remontent. */
+.intro-sea {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.intro-sea::before,
+.intro-sea::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 140' preserveAspectRatio='none'%3E%3Cpath d='M0 70 C150 120 350 20 600 70 S1050 120 1200 70 V140 H0Z' fill='%234cc0f2' fill-opacity='.22'/%3E%3C/svg%3E") repeat-x;
+  background-size: 1200px 140px;
+  animation: wave 14s linear infinite;
+}
+
+.intro-sea::after {
+  height: 110px;
+  opacity: 0.8;
+  background-position: 600px 0;
+  animation-duration: 9s;
+  animation-direction: reverse;
+}
+
+.intro-bubble {
+  position: absolute;
+  bottom: -30px;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffffff, rgb(76 192 242 / 30%));
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 80%);
+  opacity: 0.75;
+  animation: bubble var(--duration) linear infinite;
+  animation-delay: var(--delay);
+}
+
+.intro-content {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.intro-logo {
+  margin-bottom: 26px;
+  border-radius: 20px;
+  box-shadow: 0 14px 34px rgb(47 120 227 / 28%);
+  animation: float 4s ease-in-out infinite;
+}
+
+.intro-line,
+.intro-name {
+  margin: 0;
+  opacity: 0;
+}
+
+.intro-line {
+  color: var(--muted);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.intro-name {
+  padding: 0 0.15em;
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(3.2rem, 16vw, 4.8rem);
+  font-weight: 700;
+  line-height: 1.1;
+  background: linear-gradient(120deg, #ff7aa2, #e5484d 60%, #ff9a6b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.intro-heart {
+  width: 36px;
+  height: 36px;
+  margin-top: 12px;
+  overflow: visible;
+}
+
+.intro-heart path {
+  fill: transparent;
+  stroke: #e5484d;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.intro-heart.is-drawing path {
+  animation: heart-draw 1.2s ease forwards, heart-fill 0.6s ease 1.1s forwards;
+}
+
+.intro-heart.is-drawing {
+  animation: heart-beat 1.2s ease-in-out 1.7s infinite;
+}
+
+.intro-prompt {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom) + 14vh);
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  animation: hint 2s ease-in-out infinite;
+}
+
+.menu-music {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.menu-music-status {
+  min-height: 1em;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.link-button {
+  justify-self: center;
+  padding: 6px 10px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 /* ---------- Écrans plus larges ---------- */
 
 @media (min-width: 440px) {
@@ -1740,6 +1905,28 @@ body:not(.is-signed-in) .app {
 }
 
 /* ---------- Animations ---------- */
+
+@keyframes wave {
+  to { background-position-x: -1200px; }
+}
+
+@keyframes bubble {
+  to { transform: translate(20px, -110vh); }
+}
+
+@keyframes heart-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes heart-fill {
+  to { fill: #ff5a78; }
+}
+
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.2); }
+  30% { transform: scale(1); }
+}
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }

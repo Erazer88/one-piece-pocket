@@ -29,13 +29,43 @@
       onclick: () => OPP.Sound.nextTrack(),
     }, 'Piste suivante');
 
+    // Musique du menu : un fichier audio du téléphone, gardé sur l'appareil.
+    const fileInput = h('input', {
+      type: 'file',
+      accept: 'audio/*',
+      hidden: true,
+      onchange: async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        menuStatus.textContent = 'Import…';
+        try {
+          await OPP.Sound.setMenuMusic(file);
+          menuStatus.textContent = '';
+        } catch (error) {
+          menuStatus.textContent = 'Import impossible sur ce navigateur.';
+        }
+        event.target.value = '';
+      },
+    });
+    const menuButton = h('button', { class: 'btn btn-ghost btn-block', type: 'button', onclick: () => fileInput.click() });
+    const clearButton = h('button', {
+      class: 'link-button',
+      type: 'button',
+      onclick: () => OPP.Sound.clearMenuMusic(),
+    }, 'Revenir à la playlist');
+    const menuStatus = h('p', { class: 'menu-music-status' });
+
     function update() {
       const track = OPP.Sound.currentTrack();
       const enabled = OPP.Sound.settings().music;
+      const custom = OPP.Sound.hasMenuMusic();
       nowPlaying.replaceChildren(...(track && enabled
         ? [h('span', {}, 'En écoute'), h('strong', {}, track.title), h('small', {}, track.author)]
         : [h('span', {}, enabled ? 'La musique démarre au premier toucher' : 'Musique coupée')]));
+      nextButton.hidden = custom;
       nextButton.disabled = !track || !enabled;
+      menuButton.textContent = custom ? 'Changer la musique du menu' : 'Importer une musique pour le menu';
+      clearButton.hidden = !custom;
     }
 
     const content = h('div', { class: 'sound-panel' },
@@ -50,6 +80,7 @@
       }),
       nowPlaying,
       nextButton,
+      h('div', { class: 'menu-music' }, menuButton, clearButton, menuStatus, fileInput),
     );
     const unsubscribe = OPP.Sound.subscribe(update);
     update();

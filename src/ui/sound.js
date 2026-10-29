@@ -22,6 +22,8 @@
     musicGain: null,
     trackIndex: 0,
     ducked: false,
+    // Musique du menu importée par le joueur : jouée en boucle à la place de la playlist.
+    menuMusic: null,
     listeners: new Set(),
   };
   const buffers = new Map();
@@ -151,7 +153,7 @@
   // ---------- Musique ----------
 
   function track() {
-    return OPP.audio.music[state.trackIndex];
+    return state.menuMusic || OPP.audio.music[state.trackIndex];
   }
 
   function targetVolume() {
@@ -195,6 +197,7 @@
     if (!state.musicElement) {
       state.musicElement = createMusicElement();
       state.trackIndex = Math.floor(Math.random() * OPP.audio.music.length);
+      state.musicElement.loop = Boolean(state.menuMusic);
       state.musicElement.src = track().src;
     }
     state.musicElement.play().catch(() => {});
@@ -202,12 +205,43 @@
     notify();
   }
 
-  function nextTrack() {
-    if (!state.musicElement) return;
-    state.trackIndex = (state.trackIndex + 1) % OPP.audio.music.length;
-    state.musicElement.src = track().src;
-    if (state.settings.music && !document.hidden) state.musicElement.play().catch(() => {});
+  // Charge la piste courante dans le lecteur déjà créé et la lance.
+  function loadTrack() {
+    const element = state.musicElement;
+    element.loop = Boolean(state.menuMusic);
+    element.src = track().src;
+    if (state.settings.music && !document.hidden) element.play().catch(() => {});
     notify();
+  }
+
+  function nextTrack() {
+    if (!state.musicElement || state.menuMusic) return;
+    state.trackIndex = (state.trackIndex + 1) % OPP.audio.music.length;
+    loadTrack();
+  }
+
+  // `saved` : { name, blob } venant de MusicStore, ou null pour revenir à la playlist.
+  function useMenuMusic(saved) {
+    if (state.menuMusic) URL.revokeObjectURL(state.menuMusic.src);
+    state.menuMusic = saved
+      ? {
+        title: saved.name.replace(/\.[^.]+$/, '').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim(),
+        author: 'Musique du menu',
+        src: URL.createObjectURL(saved.blob),
+      }
+      : null;
+    if (state.musicElement) loadTrack();
+    else notify();
+  }
+
+  async function setMenuMusic(file) {
+    await OPP.MusicStore.save(file);
+    useMenuMusic({ name: file.name, blob: file });
+  }
+
+  async function clearMenuMusic() {
+    await OPP.MusicStore.clear();
+    useMenuMusic(null);
   }
 
   function onVisibilityChange() {
@@ -227,6 +261,9 @@
     state.settings = loadSettings(storage);
     for (const type of GESTURE_EVENTS) document.addEventListener(type, onGesture, true);
     document.addEventListener('visibilitychange', onVisibilityChange);
+    OPP.MusicStore.load().then((saved) => {
+      if (saved) useMenuMusic(saved);
+    });
   }
 
   // Baisse la musique pendant l'ouverture d'un booster.
@@ -257,6 +294,10 @@
     return state.musicElement ? track() : null;
   }
 
+  function hasMenuMusic() {
+    return Boolean(state.menuMusic);
+  }
+
   function subscribe(listener) {
     state.listeners.add(listener);
     return () => state.listeners.delete(listener);
@@ -273,6 +314,9 @@
     settings,
     currentTrack,
     nextTrack,
+    hasMenuMusic,
+    setMenuMusic,
+    clearMenuMusic,
     subscribe,
   };
 })(globalThis);
