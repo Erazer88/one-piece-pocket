@@ -1275,8 +1275,9 @@ body:not(.is-signed-in) .app {
 
 .card-stack {
   position: relative;
-  width: min(72vw, 310px, calc((100vh - 250px) * 0.716));
-  width: min(72vw, 310px, calc((100dvh - 250px) * 0.716));
+  /* Aussi grande que possible en laissant la place au nom de la carte et à la consigne. */
+  width: min(88vw, 420px, calc((100vh - 215px) * 0.716));
+  width: min(88vw, 420px, calc((100dvh - 215px) * 0.716));
   aspect-ratio: 600 / 838;
 }
 
