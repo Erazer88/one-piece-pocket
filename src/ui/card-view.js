@@ -8,16 +8,24 @@
     secret: ['#ff8fc2', '#ffd96b', '#7ee8b8', '#7cc8ff', '#c3a2ff', '#ffffff'],
   };
 
+  // Image d'une carte ; si la version sans filigrane manque, l'image officielle prend
+  // le relais.
+  function cardImage(card, props) {
+    const fallback = OPP.Cards.fallbackImageOf(card);
+    return h('img', {
+      ...props,
+      src: OPP.Cards.imageOf(card),
+      draggable: 'false',
+      onerror: (event) => {
+        if (event.target.src !== fallback) event.target.src = fallback;
+      },
+    });
+  }
+
   function cardFace(card, options = {}) {
     const tier = OPP.Cards.tierOf(card);
     return h('div', { class: `card tier-${tier}` },
-      h('img', {
-        src: OPP.Cards.imageOf(card),
-        alt: card.name,
-        loading: options.lazy ? 'lazy' : null,
-        decoding: 'async',
-        draggable: 'false',
-      }),
+      cardImage(card, { alt: card.name, loading: options.lazy ? 'lazy' : null, decoding: 'async' }),
       tier === 'super' || tier === 'secret' ? h('span', { class: 'card-foil', 'aria-hidden': 'true' }) : null,
       options.isNew ? h('span', { class: 'badge-new' }, 'Nouveau') : null,
       options.count > 1 ? h('span', { class: 'badge-count' }, `×${options.count}`) : null,
@@ -52,12 +60,7 @@
     },
       h('div', { class: 'pack-top' }, h('span', { class: 'pack-top-label' }, set.code)),
       h('div', { class: 'pack-body' },
-        h('div', { class: 'pack-art' }, h('img', {
-          src: OPP.Cards.imageOf(featured),
-          alt: '',
-          draggable: 'false',
-          loading: options.lazy ? 'lazy' : null,
-        })),
+        h('div', { class: 'pack-art' }, cardImage(featured, { alt: '', loading: options.lazy ? 'lazy' : null })),
         h('div', { class: 'pack-title' },
           h('span', { class: 'pack-brand' }, 'One Piece Card Game'),
           h('strong', {}, packTitle(set)),

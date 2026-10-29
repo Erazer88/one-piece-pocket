@@ -57,5 +57,6 @@ test('les niveaux d\'effet suivent la rareté et les variantes', () => {
   assert.equal(Cards.tierOf(byId('OP01-008_p1')), 'common');
   assert.equal(Cards.isCollectible(byId('OP01-008_p1')), false);
   assert.equal(Cards.numberOf(byId('OP01-024_p1')), 'OP01-024');
-  assert.equal(Cards.imageOf(byId('OP01-024')), 'https://optcgapi.com/media/static/Card_Images/OP01-024.jpg');
+  assert.equal(Cards.imageOf(byId('OP01-024_p1')), 'https://static.dotgg.gg/onepiece/card/OP01-024_p1.webp');
+  assert.equal(Cards.fallbackImageOf(byId('OP01-024')), 'https://optcgapi.com/media/static/Card_Images/OP01-024.jpg');
 });

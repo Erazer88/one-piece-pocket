@@ -94,8 +94,9 @@ Variantes reconnues : `parallel` (illustration alternative), `sp` (SP, SPR, Want
 Poster), `treasure`, `manga`, `superParallel` (Super Alternate Art), `gold` (versions
 or et argent) et `promo` (box toppers, dash packs… absents des boosters).
 
-Les images sont celles hébergées par l'API (les images du site Bandai bloquent
-l'affichage depuis un autre site). Elles ne sont pas copiées dans le dépôt. Les cartes et
+Les images viennent de [DotGG](https://onepiece.dotgg.gg), qui publie les visuels sans le
+filigrane « SAMPLE » des images officielles (2 910 cartes sur 2 915). Si une image y
+manque, le jeu affiche celle de l'API. Aucune image n'est copiée dans le dépôt. Les cartes et
 illustrations sont la propriété de Bandai, Eiichiro Oda, Shueisha et Toei Animation :
 projet de fan non commercial.
 

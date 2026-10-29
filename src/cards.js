@@ -25,7 +25,15 @@
     return OPP.cardTypes[card.type] || card.type;
   }
 
+  // Images sans le filigrane « SAMPLE » des visuels officiels, hébergées par DotGG
+  // (mêmes identifiants que les nôtres). Repli : l'image officielle de l'API.
+  const CLEAN_IMAGE_BASE = 'https://static.dotgg.gg/onepiece/card/';
+
   function imageOf(card) {
+    return `${CLEAN_IMAGE_BASE}${card.id}.webp`;
+  }
+
+  function fallbackImageOf(card) {
     return OPP.cardImageBase + (card.image || `${card.id}.jpg`);
   }
 
@@ -39,5 +47,15 @@
     return card.variant !== 'promo';
   }
 
-  OPP.Cards = { tierOf, scoreOf, rarityLabel, colorLabel, typeLabel, imageOf, numberOf, isCollectible };
+  OPP.Cards = {
+    tierOf,
+    scoreOf,
+    rarityLabel,
+    colorLabel,
+    typeLabel,
+    imageOf,
+    fallbackImageOf,
+    numberOf,
+    isCollectible,
+  };
 })(globalThis);
