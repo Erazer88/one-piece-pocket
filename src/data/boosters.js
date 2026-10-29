@@ -26,17 +26,18 @@
     { amount: RARE_BOOST / 500, pool: { variant: 'gold' } },
   ];
 
-  // 6 cartes par booster, comme les boosters japonais. Les Extra Boosters n'ont pas
+  // 10 cartes par booster : les cartes rares gardent les chances d'un booster réel, les
+  // autres sont des communes et peu communes. Les Extra Boosters n'ont pas
   // de peu communes.
   const TEMPLATES = {
     standard: [
-      { count: 3, pool: { rarity: 'C' } },
-      { count: 1, pool: { rarity: 'UC' } },
+      { count: 6, pool: { rarity: 'C' } },
+      { count: 2, pool: { rarity: 'UC' } },
       { count: 1, pool: { rarity: 'R' } },
       { count: 1, perBox: HITS_PER_BOX, fill: { rarity: 'UC' } },
     ],
     extra: [
-      { count: 4, pool: { rarity: 'C' } },
+      { count: 8, pool: { rarity: 'C' } },
       { count: 1, pool: { rarity: 'R' } },
       { count: 1, perBox: HITS_PER_BOX, fill: { rarity: 'C' } },
     ],

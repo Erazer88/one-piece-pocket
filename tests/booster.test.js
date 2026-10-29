@@ -21,15 +21,15 @@ test('les slots fixes et le remplissage ont des cartes dans chaque extension', (
   }
 });
 
-test('un booster contient 6 cartes distinctes, la plus rare en dernier', () => {
+test('un booster contient 10 cartes distinctes, la plus rare en dernier', () => {
   const rng = createRng(1);
   for (let i = 0; i < 500; i += 1) {
     const pack = openPack('OP-01', rng);
-    assert.equal(pack.length, 6);
-    assert.equal(OPP.Booster.packSize('OP-01'), 6);
-    assert.equal(new Set(pack.map((c) => c.id)).size, 6);
-    assert.deepEqual(pack.slice(0, 3).map((c) => c.rarity), ['C', 'C', 'C']);
-    assert.ok(pack.slice(0, 5).every((c) => !c.variant));
+    assert.equal(pack.length, 10);
+    assert.equal(OPP.Booster.packSize('OP-01'), 10);
+    assert.equal(new Set(pack.map((c) => c.id)).size, 10);
+    assert.deepEqual(pack.slice(0, 9).map((c) => c.rarity), ['C', 'C', 'C', 'C', 'C', 'C', 'UC', 'UC', 'R']);
+    assert.ok(pack.slice(0, 9).every((c) => !c.variant));
   }
 });
 
@@ -39,14 +39,14 @@ test('le tirage est déterministe pour une graine donnée', () => {
   assert.notDeepEqual(ids(42), ids(43));
 });
 
-test('chaque extension ouvre des boosters de 6 cartes sans promo', () => {
+test('chaque extension ouvre des boosters de 10 cartes sans promo', () => {
   const rng = createRng(7);
   for (const boosterId of OPP.boosterOrder) {
-    assert.equal(OPP.Booster.packSize(boosterId), 6);
+    assert.equal(OPP.Booster.packSize(boosterId), 10);
     for (let i = 0; i < 300; i += 1) {
       const pack = openPack(boosterId, rng);
-      assert.equal(pack.length, 6, boosterId);
-      assert.equal(new Set(pack.map((c) => c.id)).size, 6, boosterId);
+      assert.equal(pack.length, 10, boosterId);
+      assert.equal(new Set(pack.map((c) => c.id)).size, 10, boosterId);
       assert.ok(pack.every((c) => c.variant !== 'promo' && OPP.rarities[c.rarity]), boosterId);
     }
   }

@@ -372,6 +372,8 @@ body:not(.is-signed-in) .app {
   background: var(--surface-muted);
   box-shadow: var(--shadow-card);
   isolation: isolate;
+  /* Les étiquettes suivent la largeur de la carte (unités cqi), même toute petite. */
+  container-type: inline-size;
 }
 
 .card img {
@@ -434,11 +436,12 @@ body:not(.is-signed-in) .app {
   top: 14%;
   left: 0;
   z-index: 4;
-  padding: 2px 8px 2px 6px;
+  padding: 0.25em 0.8em 0.25em 0.6em;
   border-radius: 0 999px 999px 0;
   background: var(--danger);
   color: #fff;
   font-size: 0.66rem;
+  font-size: clamp(0.42rem, 9cqi, 0.66rem);
   font-weight: 900;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -450,12 +453,13 @@ body:not(.is-signed-in) .app {
   right: 5%;
   bottom: 3%;
   z-index: 4;
-  min-width: 26px;
-  padding: 1px 7px;
+  min-width: 2.2em;
+  padding: 0.1em 0.6em;
   border-radius: 999px;
   background: rgb(255 255 255 / 94%);
   color: var(--text);
   font-size: 0.72rem;
+  font-size: clamp(0.5rem, 10cqi, 0.72rem);
   font-weight: 900;
   text-align: center;
   box-shadow: var(--shadow-sm);
@@ -1279,7 +1283,9 @@ body:not(.is-signed-in) .app {
 .stack-card {
   position: absolute;
   inset: 0;
-  transform: translate(calc(var(--i) * 3px), calc(var(--i) * 6px)) rotate(calc(var(--i) * 1.2deg));
+  /* Seules les premières cartes sous celle du dessus sont décalées : 10 cartes en éventail
+     déborderaient. */
+  transform: translate(calc(min(var(--i), 3) * 3px), calc(min(var(--i), 3) * 6px)) rotate(calc(min(var(--i), 3) * 1.2deg));
   transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1);
   touch-action: none;
   cursor: grab;
@@ -1397,8 +1403,8 @@ body:not(.is-signed-in) .app {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
 }
 
 .summary-card {
@@ -1407,7 +1413,7 @@ body:not(.is-signed-in) .app {
   background: none;
   cursor: pointer;
   animation: pop-in 0.5s cubic-bezier(0.3, 1.4, 0.5, 1) both;
-  animation-delay: calc(var(--i) * 80ms + 150ms);
+  animation-delay: calc(var(--i) * 60ms + 150ms);
 }
 
 .summary-actions {

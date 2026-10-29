@@ -107,9 +107,9 @@ projet de fan non commercial.
 
 ## Taux de drop
 
-Un booster contient 6 cartes, comme un booster japonais : 3 C, 1 UC, 1 R et une
-dernière carte tirée selon le tableau ci-dessous (les Extra Boosters, sans peu
-communes, ont 4 C). Bandai ne publie pas de taux officiels : les taux partent des
+Un booster contient 10 cartes : 6 C, 2 UC, 1 R et une dernière carte tirée selon le
+tableau ci-dessous (les Extra Boosters, sans peu communes, ont 8 C). Les chances de
+cartes rares par booster sont celles d'un booster réel. Bandai ne publie pas de taux officiels : les taux partent des
 moyennes par boîte de 24 boosters observées par la communauté
 ([onepiece.app](https://onepiece.app/set/OP01)), appliquées à toutes les extensions.
 À partir de la Secret Rare, ils sont **triplés** (`RARE_BOOST` dans
