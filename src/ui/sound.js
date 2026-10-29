@@ -1,4 +1,4 @@
-// Lecture de la musique d'ambiance et des bruitages.
+// Lecture de la musique du menu et des bruitages.
 // Les navigateurs mobiles n'autorisent le son qu'après un geste de l'utilisateur :
 // chaque toucher relance le contexte audio et la musique si besoin.
 (function (root) {
@@ -20,9 +20,8 @@
     sfxOutput: null,
     musicElement: null,
     musicGain: null,
-    trackIndex: 0,
     ducked: false,
-    // Musique du menu importée par le joueur : jouée en boucle à la place de la playlist.
+    // Musique du menu importée par le joueur, jouée en boucle ; seule musique du jeu.
     menuMusic: null,
     listeners: new Set(),
   };
@@ -151,10 +150,7 @@
   }
 
   // ---------- Musique ----------
-
-  function track() {
-    return state.menuMusic || OPP.audio.music[state.trackIndex];
-  }
+  // Une seule musique : celle importée par le joueur (musique du menu), jouée en boucle.
 
   function targetVolume() {
     return state.ducked ? OPP.audio.duckedVolume : OPP.audio.musicVolume;
@@ -173,12 +169,9 @@
   function createMusicElement() {
     const element = new Audio();
     element.preload = 'auto';
-    element.addEventListener('ended', nextTrack);
+    element.loop = true;
     // Passer par Web Audio permet de régler le volume sur iPhone, où l'élément l'ignore.
     if (state.context) {
-      // RawGithack redirige les MP3 vers raw.githubusercontent.com : sans requête CORS,
-      // Web Audio rendrait la musique muette.
-      element.crossOrigin = 'anonymous';
       try {
         const source = state.context.createMediaElementSource(element);
         state.musicGain = state.context.createGain();
@@ -193,45 +186,30 @@
   }
 
   function startMusic() {
-    if (!state.unlocked || !state.settings.music || document.hidden) return;
-    if (!state.musicElement) {
-      state.musicElement = createMusicElement();
-      state.trackIndex = Math.floor(Math.random() * OPP.audio.music.length);
-      state.musicElement.loop = Boolean(state.menuMusic);
-      state.musicElement.src = track().src;
-    }
+    if (!state.unlocked || !state.settings.music || document.hidden || !state.menuMusic) return;
+    if (!state.musicElement) state.musicElement = createMusicElement();
+    if (state.musicElement.src !== state.menuMusic.src) state.musicElement.src = state.menuMusic.src;
     state.musicElement.play().catch(() => {});
     applyMusicVolume();
     notify();
   }
 
-  // Charge la piste courante dans le lecteur déjà créé et la lance.
-  function loadTrack() {
-    const element = state.musicElement;
-    element.loop = Boolean(state.menuMusic);
-    element.src = track().src;
-    if (state.settings.music && !document.hidden) element.play().catch(() => {});
-    notify();
-  }
-
-  function nextTrack() {
-    if (!state.musicElement || state.menuMusic) return;
-    state.trackIndex = (state.trackIndex + 1) % OPP.audio.music.length;
-    loadTrack();
-  }
-
-  // `saved` : { name, blob } venant de MusicStore, ou null pour revenir à la playlist.
+  // `saved` : { name, blob } venant de MusicStore, ou null pour retirer la musique.
   function useMenuMusic(saved) {
     if (state.menuMusic) URL.revokeObjectURL(state.menuMusic.src);
     state.menuMusic = saved
       ? {
         title: saved.name.replace(/\.[^.]+$/, '').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim(),
-        author: 'Musique du menu',
         src: URL.createObjectURL(saved.blob),
       }
       : null;
-    if (state.musicElement) loadTrack();
-    else notify();
+    if (state.menuMusic) {
+      startMusic();
+    } else if (state.musicElement) {
+      state.musicElement.pause();
+      state.musicElement.removeAttribute('src');
+    }
+    notify();
   }
 
   async function setMenuMusic(file) {
@@ -250,7 +228,7 @@
       if (state.context && state.context.state === 'running') state.context.suspend().catch(() => {});
     } else if (state.unlocked) {
       if (state.context) state.context.resume().catch(() => {});
-      if (state.settings.music && state.musicElement) state.musicElement.play().catch(() => {});
+      startMusic();
     }
   }
 
@@ -290,12 +268,9 @@
     return { ...state.settings };
   }
 
-  function currentTrack() {
-    return state.musicElement ? track() : null;
-  }
-
-  function hasMenuMusic() {
-    return Boolean(state.menuMusic);
+  // Musique du menu importée, ou null.
+  function menuMusic() {
+    return state.menuMusic;
   }
 
   function subscribe(listener) {
@@ -312,9 +287,7 @@
     setMusicEnabled,
     setSfxEnabled,
     settings,
-    currentTrack,
-    nextTrack,
-    hasMenuMusic,
+    menuMusic,
     setMenuMusic,
     clearMenuMusic,
     subscribe,

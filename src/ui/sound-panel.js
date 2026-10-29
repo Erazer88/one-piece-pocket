@@ -1,4 +1,4 @@
-// Réglages du son : musique, bruitages et piste en cours.
+// Réglages du son : musique du menu et bruitages.
 (function (root) {
   const OPP = (root.OPP = root.OPP || {});
   const { h } = OPP.Dom;
@@ -23,13 +23,9 @@
   function open() {
     const settings = OPP.Sound.settings();
     const nowPlaying = h('div', { class: 'now-playing' });
-    const nextButton = h('button', {
-      class: 'btn btn-ghost btn-block',
-      type: 'button',
-      onclick: () => OPP.Sound.nextTrack(),
-    }, 'Piste suivante');
 
     // Musique du menu : un fichier audio du téléphone, gardé sur l'appareil.
+    const menuStatus = h('p', { class: 'menu-music-status' });
     const fileInput = h('input', {
       type: 'file',
       accept: 'audio/*',
@@ -52,25 +48,21 @@
       class: 'link-button',
       type: 'button',
       onclick: () => OPP.Sound.clearMenuMusic(),
-    }, 'Revenir à la playlist');
-    const menuStatus = h('p', { class: 'menu-music-status' });
+    }, 'Retirer la musique');
 
     function update() {
-      const track = OPP.Sound.currentTrack();
+      const music = OPP.Sound.menuMusic();
       const enabled = OPP.Sound.settings().music;
-      const custom = OPP.Sound.hasMenuMusic();
-      nowPlaying.replaceChildren(...(track && enabled
-        ? [h('span', {}, 'En écoute'), h('strong', {}, track.title), h('small', {}, track.author)]
-        : [h('span', {}, enabled ? 'La musique démarre au premier toucher' : 'Musique coupée')]));
-      nextButton.hidden = custom;
-      nextButton.disabled = !track || !enabled;
-      menuButton.textContent = custom ? 'Changer la musique du menu' : 'Importer une musique pour le menu';
-      clearButton.hidden = !custom;
+      nowPlaying.replaceChildren(...(music
+        ? [h('span', {}, enabled ? 'Musique du menu' : 'Musique coupée'), h('strong', {}, music.title)]
+        : [h('span', {}, 'Aucune musique : importe un fichier audio de ton téléphone.')]));
+      menuButton.textContent = music ? 'Changer la musique' : 'Importer une musique';
+      clearButton.hidden = !music;
     }
 
     const content = h('div', { class: 'sound-panel' },
       h('h3', {}, 'Son'),
-      switchRow('Musique d\'ambiance', settings.music, (enabled) => {
+      switchRow('Musique', settings.music, (enabled) => {
         OPP.Sound.setMusicEnabled(enabled);
         OPP.Sound.play('toggle');
       }),
@@ -79,7 +71,6 @@
         OPP.Sound.play('toggle');
       }),
       nowPlaying,
-      nextButton,
       h('div', { class: 'menu-music' }, menuButton, clearButton, menuStatus, fileInput),
     );
     const unsubscribe = OPP.Sound.subscribe(update);

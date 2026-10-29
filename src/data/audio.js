@@ -1,58 +1,13 @@
-// Musiques d'ambiance et bruitages. Tous libres de droits : voir assets/audio/CREDITS.md.
+// Bruitages (libres de droits : voir assets/audio/CREDITS.md) et volume de la musique du
+// menu, que le joueur importe lui-même (voir src/music-store.js).
 (function (root) {
   const OPP = (root.OPP = root.OPP || {});
-  const MUSIC = 'assets/audio/music/';
   const SFX = 'assets/audio/sfx/';
 
   OPP.audio = {
     // Volume de la musique, normal et pendant l'ouverture d'un booster.
     musicVolume: 0.45,
     duckedVolume: 0.15,
-
-    music: [
-      {
-        title: "A Sailor's Chant",
-        author: 'Thimras',
-        license: 'CC0',
-        url: 'https://opengameart.org/content/a-sailors-chant',
-        src: `${MUSIC}sailors-chant.mp3`,
-      },
-      {
-        title: 'Mediterranean Breeze',
-        author: 'Eric Matyas (soundimage.org)',
-        license: 'CC-BY 3.0',
-        url: 'https://opengameart.org/content/mediterranean-breezelooping',
-        src: `${MUSIC}mediterranean-breeze.mp3`,
-      },
-      {
-        title: 'Merchants and Sea Salt',
-        author: 'NBJDLukasAbsolute',
-        license: 'CC0',
-        url: 'https://opengameart.org/content/merchants-and-sea-salt',
-        src: `${MUSIC}merchants-and-sea-salt.mp3`,
-      },
-      {
-        title: 'Chill lofi inspired',
-        author: 'omfgdude, boucle par qubodup',
-        license: 'CC0',
-        url: 'https://opengameart.org/content/chill-lofi-inspired-loop-edit',
-        src: `${MUSIC}chill-lofi.mp3`,
-      },
-      {
-        title: 'Seaside Village',
-        author: 'leohpaz',
-        license: 'CC-BY 4.0',
-        url: 'https://opengameart.org/content/ocean-music-pack',
-        src: `${MUSIC}seaside-village.mp3`,
-      },
-      {
-        title: 'Beach Town Guitar Theme',
-        author: 'Hitctrl',
-        license: 'CC-BY 3.0',
-        url: 'https://opengameart.org/content/beach-town-guitar-theme',
-        src: `${MUSIC}beach-town-guitar.mp3`,
-      },
-    ],
 
     // Plusieurs fichiers pour un son : un est tiré au hasard à chaque lecture.
     sounds: {
