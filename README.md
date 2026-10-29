@@ -45,9 +45,9 @@ puis copier la ligne affichée dans `OPP.accounts`.
 
 ## Introduction
 
-À chaque ouverture, l'appli affiche « par amour, pour mini » : un toucher lance la
-musique, le texte apparaît, un cœur se dessine, puis un cercle se referme sur lui pour
-révéler le menu. Un second toucher passe l'introduction.
+À chaque ouverture, l'appli affiche « mini game » : un toucher lance la musique, le
+titre apparaît, un cœur se dessine, puis un cercle se referme sur lui pour révéler le
+menu. Un second toucher passe l'introduction.
 
 ## Son
 

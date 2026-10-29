@@ -1,4 +1,4 @@
-// Introduction à l'ouverture de l'appli : « par amour, pour mini », puis passage au menu
+// Introduction à l'ouverture de l'appli : « mini game », puis passage au menu
 // par un cercle qui se referme sur le cœur. Le premier toucher lance aussi la musique.
 (function (root) {
   const OPP = (root.OPP = root.OPP || {});
@@ -39,13 +39,12 @@
 
   function show() {
     const logo = h('img', { class: 'intro-logo', src: 'assets/icon.svg', alt: '', width: '72', height: '72' });
-    const line = h('p', { class: 'intro-line' }, 'par amour,');
-    const name = h('p', { class: 'intro-name' }, 'pour mini');
+    const name = h('p', { class: 'intro-name' }, 'mini game');
     const heart = heartIcon();
     const prompt = h('p', { class: 'intro-prompt' }, 'Touche l\'écran');
     const overlay = h('div', { class: 'intro', role: 'button', tabindex: '0', 'aria-label': 'Commencer' },
       h('div', { class: 'intro-sea', 'aria-hidden': 'true' }, bubbles()),
-      h('div', { class: 'intro-content' }, logo, line, name, heart),
+      h('div', { class: 'intro-content' }, logo, name, heart),
       prompt,
     );
     let started = false;
@@ -54,7 +53,7 @@
 
     async function sequence() {
       animate(prompt, [{ opacity: 1 }, { opacity: 0 }], { duration: ms(300), fill: 'forwards' });
-      await Promise.all([reveal(line, 150), reveal(name, 1000)]);
+      await reveal(name, 200);
       heart.classList.add('is-drawing');
       await wait(ms(2300));
     }
