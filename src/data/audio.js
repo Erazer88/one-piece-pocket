@@ -1,5 +1,4 @@
-// Bruitages (libres de droits : voir assets/audio/CREDITS.md) et volume de la musique du
-// menu, que le joueur importe lui-même (voir src/music-store.js).
+// Musique du menu et bruitages : voir assets/audio/CREDITS.md.
 (function (root) {
   const OPP = (root.OPP = root.OPP || {});
   const SFX = 'assets/audio/sfx/';
@@ -8,6 +7,14 @@
     // Volume de la musique, normal et pendant l'ouverture d'un booster.
     musicVolume: 0.45,
     duckedVolume: 0.15,
+
+    // Seule musique du jeu, jouée en boucle. Œuvre protégée, ajoutée à la demande du
+    // propriétaire du dépôt : à retirer si les ayants droit le demandent.
+    music: {
+      title: 'Mother Sea (version longue)',
+      author: 'Kohei Tanaka, One Piece OST',
+      src: 'assets/audio/music/mother-sea.mp3',
+    },
 
     // Plusieurs fichiers pour un son : un est tiré au hasard à chaque lecture.
     sounds: {

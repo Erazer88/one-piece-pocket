@@ -24,40 +24,13 @@
     const settings = OPP.Sound.settings();
     const nowPlaying = h('div', { class: 'now-playing' });
 
-    // Musique du menu : un fichier audio du téléphone, gardé sur l'appareil.
-    const menuStatus = h('p', { class: 'menu-music-status' });
-    const fileInput = h('input', {
-      type: 'file',
-      accept: 'audio/*',
-      hidden: true,
-      onchange: async (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        menuStatus.textContent = 'Import…';
-        try {
-          await OPP.Sound.setMenuMusic(file);
-          menuStatus.textContent = '';
-        } catch (error) {
-          menuStatus.textContent = 'Import impossible sur ce navigateur.';
-        }
-        event.target.value = '';
-      },
-    });
-    const menuButton = h('button', { class: 'btn btn-ghost btn-block', type: 'button', onclick: () => fileInput.click() });
-    const clearButton = h('button', {
-      class: 'link-button',
-      type: 'button',
-      onclick: () => OPP.Sound.clearMenuMusic(),
-    }, 'Retirer la musique');
-
     function update() {
-      const music = OPP.Sound.menuMusic();
       const enabled = OPP.Sound.settings().music;
-      nowPlaying.replaceChildren(...(music
-        ? [h('span', {}, enabled ? 'Musique du menu' : 'Musique coupée'), h('strong', {}, music.title)]
-        : [h('span', {}, 'Aucune musique : importe un fichier audio de ton téléphone.')]));
-      menuButton.textContent = music ? 'Changer la musique' : 'Importer une musique';
-      clearButton.hidden = !music;
+      nowPlaying.replaceChildren(
+        h('span', {}, enabled ? 'Musique du menu' : 'Musique coupée'),
+        h('strong', {}, OPP.audio.music.title),
+        h('small', {}, OPP.audio.music.author),
+      );
     }
 
     const content = h('div', { class: 'sound-panel' },
@@ -71,7 +44,6 @@
         OPP.Sound.play('toggle');
       }),
       nowPlaying,
-      h('div', { class: 'menu-music' }, menuButton, clearButton, menuStatus, fileInput),
     );
     const unsubscribe = OPP.Sound.subscribe(update);
     update();

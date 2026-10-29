@@ -1,9 +1,20 @@
 # Crédits audio
 
-Bruitages libres de droits, convertis en MP3. Les licences CC-BY demandent de citer
-l'auteur : les crédits sont aussi affichés dans l'écran Profil du jeu.
+Les crédits sont aussi affichés dans l'écran Profil du jeu.
+
+## Musique
+
+| Fichier | Titre | Auteur | Droits |
+| --- | --- | --- | --- |
+| `music/mother-sea.mp3` | Mother Sea (version longue) | Kohei Tanaka, bande originale de One Piece | Œuvre protégée, tous droits réservés (Toei Animation) |
+
+Ajoutée à la demande du propriétaire du dépôt, qui en assume la responsabilité : à
+retirer si les ayants droit le demandent (supprimer le fichier et `music` dans
+`src/data/audio.js`).
 
 ## Bruitages
+
+Libres de droits, convertis en MP3. Les licences CC-BY demandent de citer l'auteur.
 
 | Fichiers | Source | Auteur | Licence |
 | --- | --- | --- | --- |

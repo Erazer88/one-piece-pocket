@@ -21,8 +21,6 @@
     musicElement: null,
     musicGain: null,
     ducked: false,
-    // Musique du menu importée par le joueur, jouée en boucle ; seule musique du jeu.
-    menuMusic: null,
     listeners: new Set(),
   };
   const buffers = new Map();
@@ -150,7 +148,7 @@
   }
 
   // ---------- Musique ----------
-  // Une seule musique : celle importée par le joueur (musique du menu), jouée en boucle.
+  // Une seule musique, celle du menu (OPP.audio.music), jouée en boucle.
 
   function targetVolume() {
     return state.ducked ? OPP.audio.duckedVolume : OPP.audio.musicVolume;
@@ -172,6 +170,9 @@
     element.loop = true;
     // Passer par Web Audio permet de régler le volume sur iPhone, où l'élément l'ignore.
     if (state.context) {
+      // RawGithack redirige les MP3 vers raw.githubusercontent.com : sans requête CORS,
+      // Web Audio rendrait la musique muette.
+      element.crossOrigin = 'anonymous';
       try {
         const source = state.context.createMediaElementSource(element);
         state.musicGain = state.context.createGain();
@@ -186,40 +187,14 @@
   }
 
   function startMusic() {
-    if (!state.unlocked || !state.settings.music || document.hidden || !state.menuMusic) return;
-    if (!state.musicElement) state.musicElement = createMusicElement();
-    if (state.musicElement.src !== state.menuMusic.src) state.musicElement.src = state.menuMusic.src;
+    if (!state.unlocked || !state.settings.music || document.hidden) return;
+    if (!state.musicElement) {
+      state.musicElement = createMusicElement();
+      state.musicElement.src = OPP.audio.music.src;
+    }
     state.musicElement.play().catch(() => {});
     applyMusicVolume();
     notify();
-  }
-
-  // `saved` : { name, blob } venant de MusicStore, ou null pour retirer la musique.
-  function useMenuMusic(saved) {
-    if (state.menuMusic) URL.revokeObjectURL(state.menuMusic.src);
-    state.menuMusic = saved
-      ? {
-        title: saved.name.replace(/\.[^.]+$/, '').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim(),
-        src: URL.createObjectURL(saved.blob),
-      }
-      : null;
-    if (state.menuMusic) {
-      startMusic();
-    } else if (state.musicElement) {
-      state.musicElement.pause();
-      state.musicElement.removeAttribute('src');
-    }
-    notify();
-  }
-
-  async function setMenuMusic(file) {
-    await OPP.MusicStore.save(file);
-    useMenuMusic({ name: file.name, blob: file });
-  }
-
-  async function clearMenuMusic() {
-    await OPP.MusicStore.clear();
-    useMenuMusic(null);
   }
 
   function onVisibilityChange() {
@@ -239,9 +214,6 @@
     state.settings = loadSettings(storage);
     for (const type of GESTURE_EVENTS) document.addEventListener(type, onGesture, true);
     document.addEventListener('visibilitychange', onVisibilityChange);
-    OPP.MusicStore.load().then((saved) => {
-      if (saved) useMenuMusic(saved);
-    });
   }
 
   // Baisse la musique pendant l'ouverture d'un booster.
@@ -268,11 +240,6 @@
     return { ...state.settings };
   }
 
-  // Musique du menu importée, ou null.
-  function menuMusic() {
-    return state.menuMusic;
-  }
-
   function subscribe(listener) {
     state.listeners.add(listener);
     return () => state.listeners.delete(listener);
@@ -287,9 +254,6 @@
     setMusicEnabled,
     setSfxEnabled,
     settings,
-    menuMusic,
-    setMenuMusic,
-    clearMenuMusic,
     subscribe,
   };
 })(globalThis);

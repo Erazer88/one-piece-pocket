@@ -51,17 +51,15 @@ révéler le menu. Un second toucher passe l'introduction.
 
 ## Son
 
-La seule musique est la **musique du menu**, importée depuis le téléphone (panneau Son,
-bouton haut-parleur en haut de l'écran). Elle est jouée en boucle à partir du premier
-toucher (les navigateurs mobiles bloquent le son avant), baisse pendant l'ouverture
-d'un booster, et reste enregistrée sur l'appareil (IndexedDB) sans jamais être envoyée
-ni publiée : les musiques de One Piece sont protégées et ne peuvent pas être mises dans
-ce dépôt public. Sans musique importée, le jeu n'a que ses bruitages.
+La musique du menu est **Mother Sea** (bande originale de One Piece, Kohei Tanaka),
+jouée en boucle à partir du premier toucher (les navigateurs mobiles bloquent le son
+avant) et baissée pendant l'ouverture d'un booster. C'est une œuvre protégée, ajoutée
+à la demande du propriétaire du dépôt : à retirer si les ayants droit le demandent.
 
 Chaque étape de l'ouverture a son bruitage : prise du booster, déchirure, sortie des
 cartes, glissement, révélation des cartes rares et récapitulatif. Les bruitages sont
 libres de droits (CC0 ou CC-BY) ; voir [`assets/audio/CREDITS.md`](assets/audio/CREDITS.md).
-Les crédits sont aussi affichés dans l'écran Profil.
+Le bouton haut-parleur en haut de l'écran coupe la musique ou les effets.
 
 ## Organisation
 
@@ -71,15 +69,14 @@ Les crédits sont aussi affichés dans l'écran Profil.
 | `src/data/cards.js` | Cartes des 20 extensions (généré, ne pas éditer). |
 | `src/data/labels.js` | Libellés, rangs et niveaux d'effet des raretés et variantes. |
 | `src/data/boosters.js` | Composition des boosters, taux de drop et recharge (déclaratif). |
-| `src/data/audio.js` | Bruitages, volumes et crédits audio. |
-| `assets/audio/` | Bruitages libres de droits (MP3). |
+| `src/data/audio.js` | Musique, bruitages, volumes et crédits audio. |
+| `assets/audio/` | Musique du menu et bruitages (MP3). |
 | `src/booster.js` | Tirage d'un booster, pur et déterministe si on lui passe une graine. |
 | `src/cards.js` | Niveau d'effet, score de rareté et libellés d'une carte. |
 | `src/collection.js` | Collection et statistiques du joueur, sauvegarde. |
 | `src/timer.js` | Recharge des boosters gratuits (pur, testé). |
 | `src/data/accounts.js` | Comptes autorisés (identifiant et empreinte du mot de passe). |
 | `src/auth.js` | Vérification de l'accès, session et progression par compte. |
-| `src/music-store.js` | Musique du menu importée, gardée sur l'appareil (IndexedDB). |
 | `src/ui/` | Interface : introduction, cartes, ouverture animée, son, écrans et modales. |
 | `src/app.js` | Initialisation et navigation entre les écrans. |
 
